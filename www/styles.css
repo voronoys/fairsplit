@@ -1,0 +1,37 @@
+.ui.item.menu, .ui.item.menu .item {
+  background: #925375;
+  color: white;
+}
+
+.ui.link.menu .item:hover, .ui.menu .dropdown.item:hover, .ui.menu .link.item:hover, .ui.menu a.item:hover {
+  color: #C0C0C0;
+}
+
+.ui.item.menu, .ui.item.menu .item .hover {
+  color: white;
+}
+
+body {
+  background: -webkit-gradient(linear, left top, left bottom, from(#FDEEE9), to(#5E2750)) fixed;
+}
+
+i.icon, i.icons {
+  font-size: 1.5em;
+}
+
+body ::-webkit-scrollbar {
+    background: white;
+}
+
+.ui.ui.ui.purple.ribbon.label {
+    border-color: #925375;
+}
+.ui.purple.labels .label, .ui.ui.ui.purple.label {
+    background-color: #9a7289;
+    color: #fff;
+}
+
+.ui.purple.labels a.label:hover, a.ui.ui.ui.purple.label:hover {
+    background-color: #925375;
+    border-color: #925375;
+}
