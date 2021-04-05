@@ -14,3 +14,11 @@ Na hora de dar o upload a gente coloca alguns exemplos para quem não tem um dat
 
 Pensei em fazer um relacionado a futebol com os dados do FIFA: https://demo.appsilon.com/apps/fifa19/#!/
 Outro fazendo o split baseado em skills com a galera do RStudio (gerando skills aleatórias): https://www.rstudio.com/about/
+
+# Problemas até o momento
+
+## Não consegui fazer a estrela ficar metade pintada
+
+## Não consegui fazer a linha ficar verticalmente centralizada
+
+## Para o exemplo do Rstudio o algoritmo demora muuuuito. menos iterações?

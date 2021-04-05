@@ -35,3 +35,7 @@ body ::-webkit-scrollbar {
     background-color: #925375;
     border-color: #925375;
 }
+
+.rounded {
+  border-radius: 50%;
+}

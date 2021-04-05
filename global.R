@@ -18,13 +18,15 @@ router <- make_router(
 
 # Data
 data <- read.table(file = "data/attributes.csv", header = TRUE, sep = ";")
+data <- read.table(file = "data/rstudio.txt", header = TRUE, sep = ";")
 
 # Settings
 n_ids <- nrow(data)
-team_size <- 5
+# team_size <- 5
+team_size <- 21
 n_teams <- n_ids/team_size
 
 # Algorithm
-n_it <- 10000
+n_it <- 1000
 buffer <- 100
 dist_metric <- "euclidian"

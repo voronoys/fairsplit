@@ -154,6 +154,7 @@ attr_column_def <- function(x, maxWidth = 120) {
     maxWidth = maxWidth, 
     align = "left", 
     aggregate = "mean",
+    format = colFormat(digits = 2),
     cell = function(value) {
       width <- paste0(value / 10 * 100, "%")
       bar_chart(value, width = width, fill = "#764567", background = "#e1e1e1")

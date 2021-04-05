@@ -68,7 +68,7 @@ split_server <- function(id) {
         maxWidth = 80,
         align = "left", 
         cell = function(value) {
-          image <- img(src = value, height = "50px")
+          image <- img(src = value, height = "50px", class = "rounded")
           tagList(
             div(style = list(display = "inline-block", width = "70px"), image)
           )
@@ -89,7 +89,7 @@ split_server <- function(id) {
       
       # Team column
       columns_list$Team <- colDef(
-        minWidth = 35,
+        minWidth = 70,
       )
       
       # Id column
