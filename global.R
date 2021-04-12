@@ -27,6 +27,6 @@ team_size <- 21
 n_teams <- n_ids/team_size
 
 # Algorithm
-n_it <- 1000
+n_it <- 100
 buffer <- 100
 dist_metric <- "euclidian"

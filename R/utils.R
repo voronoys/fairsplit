@@ -239,3 +239,43 @@ reactable_theme <- function() {
     pageButtonActiveStyle = list(backgroundColor = "hsl(0, 0%, 24%)")
   )
 }
+
+#' Radar plot
+#'
+#' @param data data.frame with the first column storing the attributes, and the other columns with values to be visualized.
+#' @param cols column names used to plot the radar
+#' @param theme see \code{\link[echarts4r]{e_theme}}
+#'
+#' @import echarts4r
+#' @return
+plot_radar <- function(data, cols, theme = "roma", max_rate = 10) {
+  
+  data_plot <- data %>%
+    select(name, !!cols)
+  
+  names(data_plot) <- make.names(names(data_plot))
+  
+  p_base <- data_plot %>% 
+    e_charts(name) 
+  
+  for(i in seq_along(cols)) {
+    p_base <- p_base %>%
+      e_radar_(names(data_plot)[-1][i], 
+               max = max_rate, 
+               names(data_plot)[-1][i]) 
+  }
+  
+  p_final <- p_base %>%
+    e_tooltip(trigger = "item") %>%
+    e_labels(show = FALSE, position = "top") %>%
+    e_theme(theme)
+  
+  return(p_final)  
+}
+
+
+
+
+
+
+
