@@ -1,12 +1,20 @@
 ui <- semanticPage(
-  title = "Fairly teams",
+  title = "Fair teams",
+  theme = "darkly",
   tags$head(
-    tags$link(rel="stylesheet", href="styles.css", type="text/css" )
+    tags$link(rel="stylesheet", href="styles.css", type="text/css"),
+    tags$script( # https://stackoverflow.com/questions/56770222/get-the-event-which-is-fired-in-shiny
+      "$(document).on('shiny:inputchanged', function(event) {
+          if (event.name != 'changed') {
+            Shiny.setInputValue('changed', event.name);
+          }
+        });"
+    )
   ),
   horizontal_menu(
     list(
-      list(name = "Splitting teams", link = route_link("splitting"), icon = "running"),
-      list(name = "Stats", link = route_link("stats"), icon = "globe europe")
+      list(name = "Home", link = route_link("home"), icon = "globe europe"),
+      list(name = "Teams", link = route_link("teams"), icon = "running")
     ),
   ),
   router$ui, 

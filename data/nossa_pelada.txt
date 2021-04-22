@@ -1,0 +1,17 @@
+id;photo;pace;shooting;dribbling;passing;defending;physical;goalkeeping
+Douglas;pelada/douglas.jpeg;8;6;8;8;7;7;3
+Luís;pelada/luis.jpeg;6;9;8;8;7;6;4
+Augusto;pelada/augusto.jpeg;7;8;7;8;8;7;4
+Godoy;pelada/godoy.jpeg;8;7;8;7;6;8;3
+Roberto;pelada/roberto.jpeg;8;8;7;8;7;8;5
+Lucas;pelada/lucas.jpeg;8;6;5;7;6;6;6
+Marcos;pelada/marcos.jpeg;6;6;6;6;6;5;4
+Wagner;pelada/wagner.jpeg;7;7;6;5;5;6;5
+Leonardo;pelada/leonardo.jpeg;8;7;5;7;7;7;4
+Paulo;pelada/paulo.jpeg;3;4;3;6;6;5;9
+Estevão;pelada/estevao.jpeg;6;6;5;7;7;7;4
+Bruno;pelada/bruno.jpeg;7;6;5;8;6;9;9
+Guilherme;pelada/guilherme.jpeg;10;9;7;8;7;9;4
+Pedro;pelada/pedro.jpeg;3;3;5;5;2;2;3
+Sabir;pelada/sabir.jpeg;7;7;7;7;7;7;5
+Rodrygo;pelada/rodrygo.jpeg;5;3;6;7;7;5;4

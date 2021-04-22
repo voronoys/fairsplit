@@ -2,31 +2,22 @@
 library(dplyr)
 library(stringr)
 library(tidyr)
+library(rhandsontable)
 library(reactable)
 library(shiny)
+library(shinyjs)
+library(shinycssloaders)
 library(shiny.semantic)
 library(shiny.router)
 
+color_box <- "#313131"
+
 source("R/utils.R")
-source("modules/module_split.R")
+source("tabs/ui_home.R")
+source("tabs/ui_split.R")
 
 # Router
 router <- make_router(
-  route("splitting", ui_split(id = "t1")),
-  route("stats", ui_split(id = "t2"))
+  route("home", ui_home),
+  route("teams", ui_split)
 )
-
-# Data
-data <- read.table(file = "data/attributes.csv", header = TRUE, sep = ";")
-data <- read.table(file = "data/rstudio.txt", header = TRUE, sep = ";")
-
-# Settings
-n_ids <- nrow(data)
-# team_size <- 5
-team_size <- 21
-n_teams <- n_ids/team_size
-
-# Algorithm
-n_it <- 100
-buffer <- 100
-dist_metric <- "euclidian"
