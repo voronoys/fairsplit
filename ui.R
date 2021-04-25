@@ -1,4 +1,4 @@
-ui <- semanticPage(
+ui <- shiny.semantic::semanticPage(
   title = "Fair teams",
   theme = "darkly",
   tags$head(
@@ -11,10 +11,10 @@ ui <- semanticPage(
         });"
     )
   ),
-  horizontal_menu(
+  shiny.semantic::horizontal_menu(
     list(
-      list(name = "Home", link = route_link("home"), icon = "globe europe"),
-      list(name = "Teams", link = route_link("teams"), icon = "running")
+      list(name = "Home", link = shiny.router::route_link("home"), icon = "globe europe"),
+      list(name = "Teams", link = shiny.router::route_link("teams"), icon = "running")
     ),
   ),
   router$ui, 

@@ -5,23 +5,37 @@ ui_home <- shiny::tagList(
     div(
       style = "display: flex; position: relative; right: 10%; left: 10%;",
       tab_voronoys(texto = "Nossa pelada", cor = color_box, icon = "bola-icon.png", id = "real_example"),
-      tab_voronoys(texto = "RStudio", cor = color_box, icon = "rstudio-icon.png", id = "rstudio_example"),
       tab_voronoys(texto = "FIFA20", cor = color_box, icon = "fifa-icon.png", id = "fifa_example"),
       tab_voronoys(texto = "Pokémon attributes", cor = color_box, icon = "pokemon-icon.png", id = "pokemon_example"),
       tab_voronoys(texto = "Company attributes", cor = color_box, icon = "ca-icon.png", id = "ca_example"),
+      tab_voronoys(texto = "RStudio toy example", cor = color_box, icon = "rstudio-icon.png", id = "rstudio_example"),
       tab_voronoys(texto = "Upload", cor = color_box, icon = "upload-icon.png", id = "upload_data")
     ),
-    modal(
-      htmlOutput(outputId = "title"),
+    shiny.semantic::modal(
+      shiny::htmlOutput(outputId = "title"),
       id = "toy_example_modal",
       
-      h3("You can change the weights of each attribute to make one more important than others."),
-      shinycssloaders::withSpinner(ui_element = rHandsontableOutput(outputId = "df_attr", height = "15em"), type = 8),
+      h3("You can change the configuration of the attributes"),
+      shinycssloaders::withSpinner(ui_element = rhandsontable::rHandsontableOutput(outputId = "df_attr", height = "15em"), type = 8),
       
-      h3("You can also change settings of the algorithm."),
-      shinycssloaders::withSpinner(ui_element = rHandsontableOutput(outputId = "df_params"), type = 8),
+      h3("You can also change the algorithm settings"),
+      shinycssloaders::withSpinner(ui_element = rhandsontable::rHandsontableOutput(outputId = "df_params"), type = 8),
       
-      footer = action_button(input_id = "run_example", label = "Run!", icon = NULL, style = "color: white"), 
+      br(),
+      
+      footer = shiny.semantic::action_button(input_id = "run_example", label = "Run!", icon = NULL, style = "color: white"), 
+      style = "color: #464545"
+    ),
+    shiny.semantic::modal(
+      h1("Upload your own dataset"),
+      id = "upload_modal",
+      
+      h3("The file must follow the following structure: 'id', 'photo', 'attributes'."),
+      file_input2(input_id = "user_data", label = NULL, multiple = FALSE, accept = c("txt", "csv"), button_label = "Browse..."),  
+      h5("Read the guidelines for a full explanation.", style = "margin-bottom: 0px"),
+      h5("Acceptable extensions: txt and csv.", style = "margin-top: 0px"),
+      
+      footer = shiny.semantic::action_button(input_id = "upload_file", label = "Upload", icon = NULL, style = "color: white"), 
       style = "color: #464545"
     ),
     br(), br(),

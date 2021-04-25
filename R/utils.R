@@ -1,4 +1,4 @@
-#' @title Cosine distance matrix
+#' @title Cosine weighted distance matrix
 #' 
 #' @param x matrix to calculate columns distance
 #' @param weights Weights for each attribute in the dataset
@@ -6,8 +6,24 @@
 #' @return Cosine distance matrix
 
 cosine <- function(x, weights) {
-  dist_mat <- x/sqrt(rowSums(x*x))
+  weights <- matrix(rep(weights, nrow(x)), ncol = ncol(x))
+  dist_mat <- (x*weights)/sqrt(rowSums(x*x*weights))
   dist_mat <- as.dist(1 - dist_mat%*%t(dist_mat))
+  
+  return(dist_mat)
+}
+
+#' @title Euclidean weighted distance matrix
+#' 
+#' @param x matrix to calculate columns distance
+#' @param weights Weights for each attribute in the dataset
+#' 
+#' @return Euclidean distance matrix
+
+euclidean <- function(x, weights) {
+  comps <- expand.grid(1:nrow(x), 1:nrow(x))
+  dist_vec <- mapply(function(i,j) sqrt(sum((weights*(x[i,] - x[j,]))^2)), comps[, 1], comps[, 2])
+  dist_mat <- as.dist(matrix(dist_vec, nrow(x), nrow(x)))
   
   return(dist_mat)
 }
@@ -31,8 +47,8 @@ f_obj <- function(data, groups, weights = 1, dist_metric = "cosine") {
   n_teams <- (nrow(means)-2)
   rownames(means) <- c(paste0("Team ", 1:n_teams), "Overall", "Out")
   
-  if(as.character(dist_metric) == "cosine") dist_mat <- cosine(x = means[1:(n_teams + 1), ])
-  if(as.character(dist_metric) == "euclidian") dist_mat <- dist(x = means[1:(n_teams + 1), ])
+  if(as.character(dist_metric) == "cosine") dist_mat <- cosine(x = means[1:(n_teams + 1), ], weights = weights)
+  if(as.character(dist_metric) == "euclidian") dist_mat <- euclidean(x = means[1:(n_teams + 1), ], weights = weights)
   
   dist_mat <- as.matrix(dist_mat)
   out <- mean(x = dist_mat[nrow(dist_mat), ]) + sd(dist_mat[nrow(dist_mat), ])
@@ -56,7 +72,7 @@ f_obj <- function(data, groups, weights = 1, dist_metric = "cosine") {
 #' @return out: Individuals not included in any team (just if n_ids != n_teams*team_size)
 #' @return probs: Array containing all probabilities during the optimization
 
-split_team <- function(data, n_teams, team_size, weights, n_it, buffer, dist_metric, seed = 1) {
+split_team <- function(data, n_teams, team_size, weights, n_it, buffer, dist_metric, seed = 4815162342) {
   # Seed 
   set.seed(seed)
   
@@ -103,7 +119,16 @@ split_team <- function(data, n_teams, team_size, weights, n_it, buffer, dist_met
   out$groups <- apply(groups[, , i], 2, function(x) data[which(x == 1), 1])
   colnames(out$groups) <- paste("Team", 1:n_teams)
   
-  return(list(best_setting = out, without_team = subset(data, !id %in% out$groups)[, 1], groups = groups, out = ids_aux, probs = probs))
+  return(
+    list(
+      best_setting = out, 
+      without_team = subset(data, !id %in% out$groups)[, 1],
+      groups = groups, 
+      out = ids_aux, 
+      probs = probs,
+      metrics = metrics
+    )
+  )
 }
 
 #' @title Bar chart to display individuals attributes
@@ -132,11 +157,11 @@ bar_chart <- function(label, width = "100%", height = "12px", fill = "#fc5185", 
 rating_stars <- function(rating, max_rating = 5) {
   star_icon <- function(half = FALSE, empty = FALSE) {
     if(half) {
-      tagAppendAttributes(
+      htmltools::tagAppendAttributes(
         shiny::icon("star-half-alt"), style = paste("color:", if (empty) "#edf0f2" else "#ffd17c"), "aria-hidden" = "true"
       )
     } else {
-      tagAppendAttributes(
+      htmltools::tagAppendAttributes(
         shiny::icon("star"), style = paste("color:", if (empty) "#edf0f2" else "#ffd17c"), "aria-hidden" = "true"
       )
     }
@@ -161,7 +186,7 @@ rating_stars <- function(rating, max_rating = 5) {
   
   label <- sprintf("%s out of %s stars", rating, max_rating)
   div(title = label, role = "img", stars)
-  }
+}
 
 #' @title Attributes column definition
 #' 
@@ -171,13 +196,13 @@ rating_stars <- function(rating, max_rating = 5) {
 #' @return colDef for reactable
 
 attr_column_def <- function(x, max) {
-  colDef(
+  reactable::colDef(
     name = x, 
     align = "center", 
     minWidth = 130,
     maxWidth = 500,
     aggregate = "mean",
-    format = colFormat(digits = 2),
+    format = reactable::colFormat(digits = 2),
     cell = function(value) {
       width <- paste0(round((value/max) * 100, 2), "%")
       bar_chart(formatter(value), width = width, fill = "#764567", background = "#e1e1e1")
@@ -201,7 +226,7 @@ next_beauty_number <- function(num) {
   sd <- as.integer((num - fd*order)/(order/10))
   
   if(order < 100) {
-    possibilities <- c(3, 5, 10, 15, 25, 50, 75, 100)
+    possibilities <- c(1, 3, 5, 10, 15, 25, 50, 75, 100)
     beauty_number <- possibilities[num+1 <= possibilities][1]
     
     fd <- as.integer(beauty_number/order)
@@ -244,26 +269,27 @@ formatter <- function(x) {
 #' @return
 
 plot_radar <- function(data, cols, theme = "roma", max_rate = 10) {
-  
   data_plot <- data %>%
-    select(name, !!cols)
+    dplyr::select(name, !!cols)
   
   names(data_plot) <- make.names(names(data_plot))
   
   p_base <- data_plot %>% 
-    e_charts(name) 
+    echarts4r::e_charts(name) 
   
   for(i in seq_along(cols)) {
     p_base <- p_base %>%
-      e_radar_(names(data_plot)[-1][i], 
-               max = max_rate, 
-               names(data_plot)[-1][i]) 
+      echarts4r::e_radar_(
+        names(data_plot)[-1][i], 
+        max = max_rate, 
+        names(data_plot)[-1][i]
+      ) 
   }
   
   p_final <- p_base %>%
-    e_tooltip(trigger = "item") %>%
-    e_labels(show = FALSE, position = "top") %>%
-    e_theme(theme)
+    echarts4r::e_tooltip(trigger = "item") %>%
+    echarts4r::e_labels(show = FALSE, position = "top") %>%
+    echarts4r::e_theme(theme)
   
   return(p_final)  
 }
@@ -313,7 +339,7 @@ reactable_theme <- function() {
   text_color_lighter <- "hsl(0, 0%, 55%)"
   bg_color <- "hsl(0, 0%, 10%)"
   
-  reactableTheme(
+  reactable::reactableTheme(
     color = text_color,
     backgroundColor = bg_color,
     borderColor = "hsl(0, 0%, 16%)",
@@ -391,4 +417,22 @@ tab_voronoys <- function(texto, cor, icon, id){
               </div></a>'))
 }
 
+#' @title File input without progress bar
+#' 
+#' @return File input HTML code
 
+file_input2 <- function(input_id, label, multiple = FALSE, accept = NULL, button_label = "Browse...", type = NULL, placeholder = "no file selected", ...) {
+  input_tag <- tags$input(id = input_id, name = input_id, type = "file", style = "display: none;")
+  if (multiple) 
+    input_tag$attribs$multiple <- "multiple"
+  if (length(accept) > 0) 
+    input_tag$attribs$accept <- paste(accept, collapse = ",")
+  shiny::div(class = "field", if (!is.null(label)) 
+    tags$label(`for` = input_id, label), 
+    tags$div(
+      class = paste("ui", type, "left action input ui-ss-input"), 
+      tags$label(class = "ui labeled icon button btn-file", tags$i(class = "file icon"), button_label, input_tag), 
+      tags$input(class = paste("ui", type, "text input"), type = "text", placeholder = placeholder, readonly = "readonly")
+    )
+  )
+}

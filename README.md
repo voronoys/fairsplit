@@ -8,8 +8,6 @@ Polar chart dos times
 
 Polar chart dos jogadores
 
-## Criar modal para upload de dados
-
 # Problemas até o momento
 
 ## Não consegui fazer a linha ficar verticalmente centralizada

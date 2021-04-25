@@ -98,3 +98,8 @@ body ::-webkit-scrollbar {
     background-size: cover;
     background-position: center center;
 }
+
+.ui.button:hover {
+    background-color: #000;
+    color: #fff;
+}
