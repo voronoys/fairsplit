@@ -86,7 +86,7 @@ shiny::observe({
     cell = function(value) {
       image <- img(src = value, height = "50px", class = "avatar")
       tagList(
-        div(style = list(display = "inline-block", width = "70px"), image)
+        shiny::div(style = list(display = "inline-block", width = "70px"), image)
       )
     }
   )

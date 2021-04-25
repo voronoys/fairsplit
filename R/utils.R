@@ -142,9 +142,9 @@ split_team <- function(data, n_teams, team_size, weights, n_it, buffer, dist_met
 #' @return barplot
 
 bar_chart <- function(label, width = "100%", height = "12px", fill = "#fc5185", background = "#e1e1e1") {
-  bar <- div(style = list(background = fill, width = width, height = height))
-  chart <- div(style = list(flexGrow = 1, marginLeft = "8px", background = background), bar)
-  div(style = list(display = "flex", alignItems = "center"), label, chart)
+  bar <- shiny::div(style = list(background = fill, width = width, height = height))
+  chart <- shiny::div(style = list(flexGrow = 1, marginLeft = "8px", background = background), bar)
+  shiny::div(style = list(display = "flex", alignItems = "center"), label, chart)
 }
 
 #' @title Stars to rate each individual
@@ -185,7 +185,7 @@ rating_stars <- function(rating, max_rating = 5) {
   )
   
   label <- sprintf("%s out of %s stars", rating, max_rating)
-  div(title = label, role = "img", stars)
+  shiny::div(title = label, role = "img", stars)
 }
 
 #' @title Attributes column definition
@@ -406,15 +406,19 @@ reactable_theme <- function() {
 #' @return Box in HTML format
 
 tab_voronoys <- function(texto, cor, icon, id){
-  HTML(paste0('<a id="', id,'" href="#" class="action-button" style="margin-left: 10px">
-                  <div class = "voronoys-block" style = "background-color:', cor, ';"> 
-                  <span class = "name">', texto, '</span>
-                  <div class="img_block">
-                    <div class="img_block_conteiner">
-                      <img src="img/', icon,'" style="width: 7em; margin: 10px 10px 10px 20px; opacity: 0.9;">
-                    </div>
-                  </div>
-              </div></a>'))
+  shiny::HTML(
+    paste0(
+    '<a id="', id,'" href="#" class="action-button" style="margin-left: 10px">
+       <div class = "voronoys-block" style = "background-color:', cor, ';"> 
+          <span class = "name">', texto, '</span>
+          <div class="img_block">
+             <div class="img_block_conteiner">
+                <img src="img/', icon,'" style="width: 7em; margin: 10px 10px 10px 20px; opacity: 0.9;">
+             </div>
+          </div>
+       </div></a>'
+    )
+  )
 }
 
 #' @title File input without progress bar
@@ -422,17 +426,17 @@ tab_voronoys <- function(texto, cor, icon, id){
 #' @return File input HTML code
 
 file_input2 <- function(input_id, label, multiple = FALSE, accept = NULL, button_label = "Browse...", type = NULL, placeholder = "no file selected", ...) {
-  input_tag <- tags$input(id = input_id, name = input_id, type = "file", style = "display: none;")
+  input_tag <- shiny::tags$input(id = input_id, name = input_id, type = "file", style = "display: none;")
   if (multiple) 
     input_tag$attribs$multiple <- "multiple"
   if (length(accept) > 0) 
     input_tag$attribs$accept <- paste(accept, collapse = ",")
   shiny::div(class = "field", if (!is.null(label)) 
-    tags$label(`for` = input_id, label), 
-    tags$div(
+    shiny::tags$label(`for` = input_id, label), 
+    shiny::tags$div(
       class = paste("ui", type, "left action input ui-ss-input"), 
-      tags$label(class = "ui labeled icon button btn-file", tags$i(class = "file icon"), button_label, input_tag), 
-      tags$input(class = paste("ui", type, "text input"), type = "text", placeholder = placeholder, readonly = "readonly")
+      shiny::tags$label(class = "ui labeled icon button btn-file", shiny::tags$i(class = "file icon"), button_label, input_tag), 
+      shiny::tags$input(class = paste("ui", type, "text input"), type = "text", placeholder = placeholder, readonly = "readonly")
     )
   )
 }
