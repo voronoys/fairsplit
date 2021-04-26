@@ -405,15 +405,15 @@ reactable_theme <- function() {
 #' 
 #' @return Box in HTML format
 
-tab_voronoys <- function(texto, cor, icon, id){
+tab_voronoys <- function(text, text_color, background_color, border_color = "#8c77fa", icon, id) {
   shiny::HTML(
     paste0(
-    '<a id="', id,'" href="#" class="action-button" style="margin-left: 10px">
-       <div class = "voronoys-block" style = "background-color:', cor, ';"> 
-          <span class = "name">', texto, '</span>
+      '<a id="', id, '" href="#" class="action-button" style="margin-left: 5px; margin-right: 5px">
+       <div class = "voronoys-block" style = "background-color:', background_color, '; border: 2px solid', border_color, ';}"> 
+          <span class = "name" style = "color:', text_color, '">', text, '</span>
           <div class="img_block">
              <div class="img_block_conteiner">
-                <img src="img/', icon,'" style="width: 7em; margin: 10px 10px 10px 20px; opacity: 0.9;">
+                <img src="img/', icon,'" style="width: 6em; margin: 10px 10px 10px 20px; opacity: 0.9;">
              </div>
           </div>
        </div></a>'
@@ -421,22 +421,17 @@ tab_voronoys <- function(texto, cor, icon, id){
   )
 }
 
-#' @title File input without progress bar
-#' 
-#' @return File input HTML code
-
-file_input2 <- function(input_id, label, multiple = FALSE, accept = NULL, button_label = "Browse...", type = NULL, placeholder = "no file selected", ...) {
-  input_tag <- shiny::tags$input(id = input_id, name = input_id, type = "file", style = "display: none;")
-  if (multiple) 
-    input_tag$attribs$multiple <- "multiple"
-  if (length(accept) > 0) 
-    input_tag$attribs$accept <- paste(accept, collapse = ",")
-  shiny::div(class = "field", if (!is.null(label)) 
-    shiny::tags$label(`for` = input_id, label), 
-    shiny::tags$div(
-      class = paste("ui", type, "left action input ui-ss-input"), 
-      shiny::tags$label(class = "ui labeled icon button btn-file", shiny::tags$i(class = "file icon"), button_label, input_tag), 
-      shiny::tags$input(class = paste("ui", type, "text input"), type = "text", placeholder = placeholder, readonly = "readonly")
+action_link <- function(inputId, label, icon, ...) {
+  out <- shiny::tags$li(
+    class="shiny-material-side-nav-tab active", 
+    shiny::a( 
+      id = inputId,
+      href = "#", 
+      class = "action-button", 
+      shiny::icon(icon), 
+      label, 
+      ...
     )
   )
+  return(out)
 }

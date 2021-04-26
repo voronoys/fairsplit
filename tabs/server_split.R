@@ -1,4 +1,4 @@
-split_reactive <- shiny::eventReactive(input$phantom_input, {
+split_reactive <- shiny::eventReactive(input$run_example, {
   data_params <- data_example()
   data <- data_params$scaled_data[, -2]
   
@@ -35,7 +35,7 @@ split_reactive <- shiny::eventReactive(input$phantom_input, {
       description = data_params$description
     )
   )
-})
+}, ignoreInit = TRUE)
 
 data_full <- shiny::reactive({
   out <- split_reactive()
@@ -59,8 +59,6 @@ data_full <- shiny::reactive({
 })
 
 shiny::observe({
-  input$phantom_input
-  
   # Data
   out <- data_full()
   df <- out$data
@@ -128,7 +126,7 @@ shiny::observe({
     onClick = "expand", 
     striped = TRUE, 
     groupBy = "team", 
-    theme = reactable_theme,
+    # theme = reactable_theme,
     columns = columns_list,  
     defaultPageSize = 11
   )
@@ -137,28 +135,16 @@ shiny::observe({
 })
 
 shiny::observe({
-  input$phantom_input
-  
   # Data
-  data <- data_full()$data
+  out <- data_full()
+  description <- out$description
+  data <- out$data %>%
+    dplyr::select(-overall)
   
-  # Plot 1: Overall ratings
-  teams <- unique(data$team)
+  names(data)[-c(1:3)] <- description
   
-  if("Out" %in% teams) {
-    cols <- c(rep("#B2DF8A", dplyr::n_distinct(data$team) - 1), "#e0e0e0")
-  } else {
-    cols <- rep("#B2DF8A", dplyr::n_distinct(data$team)) 
-  }
-  
-  plt_overall <- plot_ly(data = data, y = ~overall, color = ~team, colors = cols, type = "box") %>% 
-    layout(xaxis = list(title = NULL), yaxis = list(title = "Overall", range = c(0, 10)))
-  
-  output$boxplot_groups <- plotly::renderPlotly(plt_overall)
-  
-  # Plot 2: Skill ratings
+ # Plot: Skill ratings
   data <- data %>%
-    dplyr::select(-overall) %>%
     tidyr::pivot_longer(cols = where(is.numeric), names_to = "skill", values_to = "rate")
   
   plt_skills <- plot_ly(data = data, y = ~rate, x = ~team, color = ~skill, colors = "BrBG", type = "box") %>% 

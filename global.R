@@ -12,7 +12,9 @@ library(shinyWidgets)
 library(shinymaterial)
 
 color_box <- "#313131"
+color_box2 <- "#f7f8ca"
+text_color <- "#8c77fa"
+border_color <- "#8c77fa"
 
 source("R/utils.R")
-source("tabs/ui_home.R")
 source("tabs/ui_split.R")
