@@ -1,11 +1,10 @@
 #' @title Cosine distance matrix
 #' 
 #' @param x matrix to calculate columns distance
-#' @param weights Weights for each attribute in the dataset
 #' 
 #' @return Cosine distance matrix
 
-cosine <- function(x, weights) {
+cosine <- function(x) {
   dist_mat <- x/sqrt(rowSums(x*x))
   dist_mat <- as.dist(1 - dist_mat%*%t(dist_mat))
   
@@ -16,36 +15,32 @@ cosine <- function(x, weights) {
 #' 
 #' @param data data.frame with ids in the rows and attributes in the columns
 #' @param groups n_ids by n_teams matrix composed by zeros and ones
-#' @param weights Weights for each attribute in the dataset
 #' @param dist_metric Distance metric to compute the dissimilarities 
 #' 
 #' @return metric: the summary metric
 #' @return means: attributes means by team
 #' @return dist: distance matrix between teams
 
-f_obj <- function(data, groups, weights = 1, dist_metric = "cosine") {
+f_obj <- function(data, groups, dist_metric = "cosine") {
   means <- t(apply(X = groups, MARGIN = 2, FUN = function(x) colMeans(data[x == 1, ][-1])))
   means <- rbind(means, colMeans(means))
-  means <- rbind(means, colMeans(data[rowSums(groups) == 0, -1]))
   
-  n_teams <- (nrow(means)-2)
-  rownames(means) <- c(paste0("Team ", 1:n_teams), "Overall", "Out")
+  rownames(means) <- c(paste0("Team ", 1:n_teams), "Overall")
   
-  if(as.character(dist_metric) == "cosine") dist_mat <- cosine(x = means[1:(n_teams + 1), ])
-  if(as.character(dist_metric) == "euclidian") dist_mat <- dist(x = means[1:(n_teams + 1), ])
+  if(dist_metric == "cosine") dist_mat <- cosine(x = means)
+  if(dist_metric == "euclidian") dist_mat <- dist(x = means)
   
   dist_mat <- as.matrix(dist_mat)
-  out <- mean(x = dist_mat[nrow(dist_mat), ]) + sd(dist_mat[nrow(dist_mat), ])
+  out <- mean(dist_mat[nrow(dist_mat),]) + sd(dist_mat[nrow(dist_mat),])
   
   return(list(metric = out, means = means, dist = dist_mat))
 }
 
-#' @title Split individuals into fair teams
+#' @title Split individuals into fairly teams
 #' 
 #' @param data data.frame with ids in the rows and attributes in the columns
 #' @param n_teams n_ids by n_teams matrix composed by zeros and ones
 #' @param team_size Distance metric to compute the dissimilarities 
-#' @param weights Weights for each attribute in the dataset
 #' @param n_it Number of iterations
 #' @param buffer Number of iterations to have just random samples
 #' @param dist_metric Distance metric to compute the dissimilarities 
@@ -56,7 +51,7 @@ f_obj <- function(data, groups, weights = 1, dist_metric = "cosine") {
 #' @return out: Individuals not included in any team (just if n_ids != n_teams*team_size)
 #' @return probs: Array containing all probabilities during the optimization
 
-split_team <- function(data, n_teams, team_size, weights, n_it, buffer, dist_metric, seed = 1) {
+split_team <- function(data, n_teams, team_size, n_it, buffer, dist_metric, seed = 1) {
   # Seed 
   set.seed(seed)
   
@@ -80,13 +75,12 @@ split_team <- function(data, n_teams, team_size, weights, n_it, buffer, dist_met
         total <- rowSums(groups[, j, (i-buffer):(i-1)])
         probs_aux[, j] <- total/sum(total)
       }
-      samp <- sample(x = ids_aux, size = team_size, prob = probs_aux[ids_aux, j] + tol)
-      group_aux[samp, j] <- 1
+      group_aux[sample(x = ids_aux, size = team_size, prob = probs_aux[ids_aux, j] + tol), j] <- 1
       
-      ids_aux <- ids_aux[!ids_aux %in% samp]
+      ids_aux <- ids[-which(group_aux[, j] == 1)]
     }
     
-    metric_i <- f_obj(data = data, groups = group_aux, weights = weights, dist_metric = dist_metric)$metric
+    metric_i <- f_obj(data = data, groups = group_aux, dist_metric = dist_metric)$metric
     metrics[i] <- metric_i
     
     if(metric_i < metric) {
@@ -99,11 +93,11 @@ split_team <- function(data, n_teams, team_size, weights, n_it, buffer, dist_met
     }
   }
   
-  out <- f_obj(data = data, groups = groups[, , i], weights = weights, dist_metric = dist_metric)
+  out <- f_obj(data = data, groups = groups[, , i], dist_metric = dist_metric)
   out$groups <- apply(groups[, , i], 2, function(x) data[which(x == 1), 1])
   colnames(out$groups) <- paste("Team", 1:n_teams)
   
-  return(list(best_setting = out, without_team = subset(data, !id %in% out$groups)[, 1], groups = groups, out = ids_aux, probs = probs))
+  return(list(best_setting = out, groups = groups, out = ids_aux, probs = probs))
 }
 
 #' @title Bar chart to display individuals attributes
@@ -130,38 +124,22 @@ bar_chart <- function(label, width = "100%", height = "12px", fill = "#fc5185", 
 #' @return max_rating stars
 
 rating_stars <- function(rating, max_rating = 5) {
-  star_icon <- function(half = FALSE, empty = FALSE) {
-    if(half) {
-      tagAppendAttributes(
-        shiny::icon("star-half-alt"), style = paste("color:", if (empty) "#edf0f2" else "#ffd17c"), "aria-hidden" = "true"
-      )
-    } else {
-      tagAppendAttributes(
-        shiny::icon("star"), style = paste("color:", if (empty) "#edf0f2" else "#ffd17c"), "aria-hidden" = "true"
-      )
-    }
+  star_icon <- function(empty = FALSE) {
+    tagAppendAttributes(
+      shiny::icon("star"),
+      style = paste("color:", if (empty) "#edf0f2" else "#ffd17c"),
+      "aria-hidden" = "true"
+    )
   }
   
-  full_star <- round(rating)
-  half_star <- as.integer((rating - full_star) > 0)
-  empty_star <- max_rating - full_star - half_star
-  
-  stars <- lapply(
-    seq_len(max_rating), 
-    function(i) {
-      if(i <= full_star) {
-        star_icon() 
-      } else if(i <= full_star + half_star) {
-        star_icon(half = TRUE)
-      } else {
-        star_icon(empty = TRUE)
-      }
-    }
-  )
+  rounded_rating <- floor(rating + 0.5)
+  stars <- lapply(seq_len(max_rating), function(i) {
+    if (i <= rounded_rating) star_icon() else star_icon(empty = TRUE)
+  })
   
   label <- sprintf("%s out of %s stars", rating, max_rating)
   div(title = label, role = "img", stars)
-  }
+}
 
 #' @title Attributes column definition
 #' 
@@ -170,135 +148,22 @@ rating_stars <- function(rating, max_rating = 5) {
 #' 
 #' @return colDef for reactable
 
-attr_column_def <- function(x, max) {
+attr_column_def <- function(x, maxWidth = 120) {
   colDef(
-    name = x, 
-    align = "center", 
-    minWidth = 130,
-    maxWidth = 500,
+    name = x,
+    maxWidth = maxWidth, 
+    align = "left", 
     aggregate = "mean",
     format = colFormat(digits = 2),
     cell = function(value) {
-      width <- paste0(round((value/max) * 100, 2), "%")
-      bar_chart(formatter(value), width = width, fill = "#764567", background = "#e1e1e1")
+      width <- paste0(value / 10 * 100, "%")
+      bar_chart(value, width = width, fill = "#764567", background = "#e1e1e1")
     },
-    html = TRUE,
-    style = "display: 'flex'; flexDirection: 'column'; justifyContent: 'center'"
+    html = TRUE
   )
 }
 
-#' @title Find the next beauty number (under my definition of beauty)
-#' 
-#' @param x A number
-#' 
-#' @return Next beauty number
-
-next_beauty_number <- function(num) {
-  num <- num - 1
-  order <- 10^(nchar(num) - 1)
-  
-  fd <- as.integer(num/order)
-  sd <- as.integer((num - fd*order)/(order/10))
-  
-  if(order < 100) {
-    possibilities <- c(3, 5, 10, 15, 25, 50, 75, 100)
-    beauty_number <- possibilities[num+1 <= possibilities][1]
-    
-    fd <- as.integer(beauty_number/order)
-    sd <- as.integer((beauty_number - fd*order)/(order/10))
-  } else if(sd >= 5) {
-    sd <- 0
-    fd <- fd + 1
-  } else {
-    sd <- 5
-  }
-  
-  beauty_number <- fd*order + sd*(order/10)
-  
-  return(beauty_number)  
-}
-
-#' @title Format numbers to display
-#' 
-#' @param x A data.frame column
-#' 
-#' @return Formated number
-
-formatter <- function(x) {
-  dplyr::case_when(
-    x < 1e3 ~ as.character(round(x)),
-    x < 1e6 ~ paste0(as.character(round(x/1e3, 1)), "K"),
-    x < 1e9 ~ paste0(as.character(x/1e6, 1), "M"),
-    x < 1e12 ~ paste0(as.character(x/1e9, 1), "B"),
-    TRUE ~ as.character(x)
-  )
-}
-
-#' @title Radar plot
-#'
-#' @param data data.frame with the first column storing the attributes, and the other columns with values to be visualized.
-#' @param cols column names used to plot the radar
-#' @param theme see \code{\link[echarts4r]{e_theme}}
-#'
-#' @import echarts4r
-#' @return
-
-plot_radar <- function(data, cols, theme = "roma", max_rate = 10) {
-  
-  data_plot <- data %>%
-    select(name, !!cols)
-  
-  names(data_plot) <- make.names(names(data_plot))
-  
-  p_base <- data_plot %>% 
-    e_charts(name) 
-  
-  for(i in seq_along(cols)) {
-    p_base <- p_base %>%
-      e_radar_(names(data_plot)[-1][i], 
-               max = max_rate, 
-               names(data_plot)[-1][i]) 
-  }
-  
-  p_final <- p_base %>%
-    e_tooltip(trigger = "item") %>%
-    e_labels(show = FALSE, position = "top") %>%
-    e_theme(theme)
-  
-  return(p_final)  
-}
-
-#' @title Scale a number to 0-1 scale
-#'
-#' @param x a number between min and max
-#' @param min minimum value in the scale
-#' @param max maximum value in the scale
-#'
-#' @return the number in the 0-1 scale
-
-to_01 <- function(x, min = 0, max = 1) {
-  if(any(x < min) | any(x > max)) stop("The number must be something between min and max")
-  out <- (x-min)/(max-min)
-  
-  return(out)
-}
-
-#' @title Rescale a number to min-max scale
-#'
-#' @param x a number between 0 and 1
-#' @param min minimum value in the scale
-#' @param max maximum value in the scale
-#'
-#' @return the number in the min-max scale
-
-to_minmax <- function(x, min = 0, max = 1) {
-  if(x < 0 | x > 1) stop("The number must be something between 0 and 1")
-  out <- (max-min)*x + min
-  
-  return(out)
-}
-
-#' @title Theme for reactable (copy from https://glin.github.io/reactable/articles/spotify-charts/spotify-charts.html)
+#' @title Theme for reactable (copied from https://glin.github.io/reactable/articles/spotify-charts/spotify-charts.html)
 #' 
 #' @return Theme for reactable
 
@@ -364,7 +229,7 @@ reactable_theme <- function() {
       backgroundSize = "16px",
       backgroundPosition = "left 8px center",
       backgroundRepeat = "no-repeat",
-      "&:focus" = list(backgroundColor = "#3c4e82", border = "none"),
+      "&:focus" = list(backgroundColor = "rgba(255, 255, 255, 0.1)", border = "none"),
       "&:hover, &:focus" = list(backgroundImage = search_icon(text_color)),
       "::placeholder" = list(color = text_color_lighter),
       "&:hover::placeholder, &:focus::placeholder" = list(color = text_color)
@@ -375,20 +240,42 @@ reactable_theme <- function() {
   )
 }
 
-#' @title Box for the examples
-#' 
-#' @return Box in HTML format
-
-tab_voronoys <- function(texto, cor, icon, id){
-  HTML(paste0('<a id="', id,'" href="#" class="action-button" style="margin-left: 10px">
-                  <div class = "voronoys-block" style = "background-color:', cor, ';"> 
-                  <span class = "name">', texto, '</span>
-                  <div class="img_block">
-                    <div class="img_block_conteiner">
-                      <img src="img/', icon,'" style="width: 7em; margin: 10px 10px 10px 20px; opacity: 0.9;">
-                    </div>
-                  </div>
-              </div></a>'))
+#' Radar plot
+#'
+#' @param data data.frame with the first column storing the attributes, and the other columns with values to be visualized.
+#' @param cols column names used to plot the radar
+#' @param theme see \code{\link[echarts4r]{e_theme}}
+#'
+#' @import echarts4r
+#' @return
+plot_radar <- function(data, cols, theme = "roma", max_rate = 10) {
+  
+  data_plot <- data %>%
+    select(name, !!cols)
+  
+  names(data_plot) <- make.names(names(data_plot))
+  
+  p_base <- data_plot %>% 
+    e_charts(name) 
+  
+  for(i in seq_along(cols)) {
+    p_base <- p_base %>%
+      e_radar_(names(data_plot)[-1][i], 
+               max = max_rate, 
+               names(data_plot)[-1][i]) 
+  }
+  
+  p_final <- p_base %>%
+    e_tooltip(trigger = "item") %>%
+    e_labels(show = FALSE, position = "top") %>%
+    e_theme(theme)
+  
+  return(p_final)  
 }
+
+
+
+
+
 
 
