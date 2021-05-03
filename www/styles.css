@@ -1,39 +1,10 @@
-.ui.item.menu, .ui.item.menu .item {
-  background: #e0e0e0;
-  color: #505050;
+nav {
+  color: #fff;
+  background-color: #8c77fa;
 }
-
-.ui.link.menu .item:hover, .ui.menu .dropdown.item:hover, .ui.menu .link.item:hover, .ui.menu a.item:hover {
-  color: #505050;
-} 
-
-.ui.item.menu, .ui.item.menu .item .hover {
-  color: #505050;
-} 
 
 body {
-  background: url(https://images5.alphacoders.com/912/912044.jpg);
-}
-
-i.icon, i.icons {
-  font-size: 1.5em;
-}
-
-body ::-webkit-scrollbar {
-    background: white;
-}
-
-.ui.ui.ui.purple.ribbon.label {
-    border-color: #925375;
-}
-.ui.purple.labels .label, .ui.ui.ui.purple.label {
-    background-color: #9a7289;
-    color: #fff;
-}
-
-.ui.purple.labels a.label:hover, a.ui.ui.ui.purple.label:hover {
-    background-color: #925375;
-    border-color: #925375;
+  background-color: #f7f8cc !important;
 }
 
 .voronoys-block {
@@ -97,4 +68,9 @@ body ::-webkit-scrollbar {
     float: left;
     background-size: cover;
     background-position: center center;
+}
+
+.ui.button:hover {
+    background-color: #000;
+    color: #fff;
 }

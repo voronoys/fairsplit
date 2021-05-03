@@ -1,6 +1,6 @@
 server <- function(input, output, session) {
   # Router pages
-  router$server(input, output, session)
+  # router$server(input, output, session)
   
   # Home
   source("tabs/server_home.R", local = TRUE)

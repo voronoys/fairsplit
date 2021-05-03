@@ -1,3 +1,8 @@
+shiny::observeEvent(input$upload_data, {
+  # Open modal
+  shiny.semantic::show_modal(id = 'upload_modal', session = session)
+})
+
 open_data <- shiny::eventReactive(
   c(input$real_example, 
     input$rstudio_example, 
@@ -7,9 +12,6 @@ open_data <- shiny::eventReactive(
     input$upload_file), {
       # Who fired the reactive?
       changed <- shiny::req(input$changed)
-      
-      # Updating run button
-      shinyjs::reset(id = "run_example")
       
       data <- title <- n_teams <- team_size <- NULL
       # Open data
@@ -121,7 +123,7 @@ shiny::observe({
     vars <- names(data[, -c(1, 2)])
     
     # Modal title  
-    output$title <- renderText(data_params$title)
+    output$title <- renderText(sprintf("<h1 style='color=#C0C0C0 !important'>%s</h1>", data_params$title))
     
     # Attributes table
     output$df_attr <- rhandsontable::renderRHandsontable({
@@ -197,4 +199,13 @@ data_example <- shiny::eventReactive(input$run_example, {
       params = params
     )
   )
+})
+
+shiny::observeEvent(input$run_example, {
+  shiny.router::change_page(page = "teams", session = session)
+  shiny.semantic::hide_modal('toy_example_modal')
+})
+
+shiny::observeEvent(input$run_example, {
+  shiny::updateNumericInput(inputId = "phantom_input", session = session, label = NULL, value = input$phantom_input + 1)
 })

@@ -8,9 +8,9 @@ url_images <- "https://raw.githubusercontent.com/phalt/pokeapi/master/data/Pokem
 load("data/pokemon.rda")
 
 pokemon <- pokemon %>%
-  mutate(photo = paste0(url_images, url_image)) %>%
-  select(pokemon, photo, height, weight, base_experience, attack, defense, hp, special_attack, special_defense, speed) %>%
-  rename(id = pokemon)
+  dplyr::mutate(photo = paste0(url_images, url_image)) %>%
+  dplyr::select(pokemon, photo, height, weight, base_experience, attack, defense, hp, special_attack, special_defense, speed) %>%
+  dplyr::rename(id = pokemon)
 
 # Saving file
 write.table(x = pokemon, file = "data/pokemon.txt", sep = ";", row.names = FALSE)
