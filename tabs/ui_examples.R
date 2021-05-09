@@ -58,11 +58,12 @@ ui_examples <- shiny::tagList(
   ),
   shiny::conditionalPanel(
     condition = "input.run_example",
+    # Teams
     shinymaterial::material_row(
       shinymaterial::material_column(
         width = 12,
         shinymaterial::material_card(
-          title = "Overall results",
+          title = "Teams",
           divider = TRUE,
           shiny::br(),
           shinymaterial::material_checkbox(input_id = "scaled_attrs", label = "Scaled attributes", initial_value = FALSE),
@@ -72,7 +73,7 @@ ui_examples <- shiny::tagList(
             shinymaterial::material_column(
               width = 8,
               shinymaterial::material_card(
-                title = "Scaled skills",
+                title = "Skills",
                 divider = TRUE,
                 shinycssloaders::withSpinner(ui_element = plotly::plotlyOutput(outputId = "boxplot_groups_skills"), type = 8)
               )
@@ -81,29 +82,65 @@ ui_examples <- shiny::tagList(
             shinymaterial::material_column(
               width = 4,
               shinymaterial::material_card(
-                title = "Teams comparison",
+                title = "Comparison",
                 divider = TRUE,
                 shinycssloaders::withSpinner(ui_element = echarts4r::echarts4rOutput(outputId = "radar_teams"), type = 8)
+              )
+            ),
+            # Table
+            shinymaterial::material_column(
+              width = 12, 
+              shinymaterial::material_card(
+                title = "Teams",
+                divider = TRUE,
+                shinycssloaders::withSpinner(ui_element = reactable::reactableOutput(outputId = "tab_groups"), type = 8)
               )
             )
           )
         )
       )
     ),
-    # Table
+    # Individuals
     shinymaterial::material_row(
       shinymaterial::material_column(
         width = 12, 
         shinymaterial::material_card(
-          title = "Teams",
+          title = "Individuals",
           divider = TRUE,
           shinymaterial::material_row(
             shiny::br(),
-            shinycssloaders::withSpinner(ui_element = reactable::reactableOutput(outputId = "tab_groups"), type = 8)
+            # ??
+            shinymaterial::material_column(
+              width = 4, 
+              shinymaterial::material_card(
+                title = "Metric's over iterations",
+                divider = TRUE,
+                # shinycssloaders::withSpinner(ui_element = plotly::plotlyOutput(outputId = "plot_metric"), type = 8)
+              )
+            ),
+            # ??
+            shinymaterial::material_column(
+              width = 4, 
+              shinymaterial::material_card(
+                title = "Distance matrix",
+                divider = TRUE,
+                # shinycssloaders::withSpinner(ui_element = plotly::plotlyOutput(outputId = "plot_distance"), type = 8)
+              )
+            ),
+            # ??
+            shinymaterial::material_column(
+              width = 4, 
+              shinymaterial::material_card(
+                title = "Distance matrix",
+                divider = TRUE,
+                # shinycssloaders::withSpinner(ui_element = plotly::plotlyOutput(outputId = "plot_distance"), type = 8)
+              )
+            )
           )
         )
       )
     ),
+    # Algorithm
     shinymaterial::material_row(
       shinymaterial::material_column(
         width = 12, 
@@ -116,8 +153,9 @@ ui_examples <- shiny::tagList(
             shinymaterial::material_column(
               width = 4, 
               shinymaterial::material_card(
-                title = "Metric's time series",
+                title = "Metric's over iterations",
                 divider = TRUE,
+                shiny::br(),
                 shinycssloaders::withSpinner(ui_element = plotly::plotlyOutput(outputId = "plot_metric"), type = 8)
               )
             ),
@@ -127,7 +165,24 @@ ui_examples <- shiny::tagList(
               shinymaterial::material_card(
                 title = "Distance matrix",
                 divider = TRUE,
+                shiny::br(),
                 shinycssloaders::withSpinner(ui_element = plotly::plotlyOutput(outputId = "plot_distance"), type = 8)
+              )
+            ),
+            # Probability
+            shinymaterial::material_column(
+              width = 12, 
+              shinymaterial::material_column(
+                width = 3,
+                shiny::uiOutput(outputId = "selected_team_btn")
+              ),
+              shinymaterial::material_column(
+                width = 12,
+                shinymaterial::material_card(
+                  title = "Inclusion probability by team",
+                  divider = TRUE,
+                  shinycssloaders::withSpinner(ui_element = plotly::plotlyOutput(outputId = "plot_probs", height = "90%"), type = 8)
+                )
               )
             )
           )

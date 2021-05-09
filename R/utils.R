@@ -5,10 +5,25 @@
 #' 
 #' @return Cosine distance matrix
 
+cosine_sim <- function(X_mat, i, j, w) {
+  x <- X_mat[i, ]
+  y <- X_mat[j, ]
+  
+  out <- sum(w*x*y)/sqrt(sum(w*x^2)*sum(w*y^2))
+  return(out)
+}   
+
 cosine <- function(x, weights) {
-  weights <- matrix(rep(weights, nrow(x)), ncol = ncol(x))
-  dist_mat <- (x*weights)/sqrt(rowSums(x*x*weights))
-  dist_mat <- as.dist(1 - dist_mat%*%t(dist_mat))
+  n <- nrow(x) 
+  combs <- t(combn(x = n:1, m = 2))
+  lower_tri <- apply(X = combs, MARGIN = 1, FUN = function(comb) cosine_sim(X_mat = x, i = comb[1], j = comb[2],  w = weights))
+  
+  sim <- matrix(NA, nrow = n, ncol = n)
+  diag(sim) <- 0
+  sim[combs] <- lower_tri
+  colnames(sim) <- rownames(sim) <- rownames(x)
+  
+  dist_mat <-  as.dist(1 - sim)
   
   return(dist_mat)
 }
@@ -51,7 +66,7 @@ f_obj <- function(data, groups, weights = 1, dist_metric = "cosine") {
   if(as.character(dist_metric) == "euclidian") dist_mat <- euclidean(x = means[1:(n_teams + 1), ], weights = weights)
   
   dist_mat <- as.matrix(dist_mat)
-  out <- mean(x = dist_mat[nrow(dist_mat), ]) + sd(dist_mat[nrow(dist_mat), ])
+  out <- sum(x = dist_mat[nrow(dist_mat), ]) + sd(dist_mat[nrow(dist_mat), ])
   
   return(list(metric = out, means = means, dist = dist_mat))
 }
@@ -88,7 +103,7 @@ split_team <- function(data, n_teams, team_size, weights, n_it, buffer, dist_met
   
   for(i in 1:n_it) {
     group_aux <- matrix(0, nrow = n_ids, ncol = n_teams)
-    probs_aux <- matrix(1/n_teams, nrow = n_ids, ncol = n_teams)
+    probs_aux <- matrix(1/n_ids, nrow = n_ids, ncol = n_teams)
     ids_aux <- ids
     
     for(j in sample(1:n_teams)) {
@@ -278,11 +293,11 @@ plot_radar <- function(data, name_col = "name", cols, theme = "roma") {
   p_base <- data_plot %>% 
     echarts4r::e_charts(name) 
   
-  max_rate <- next_beauty_number(num = max(data[, -1]))
+  max_rate <- apply(X = data[, -1], MARGIN = 1, FUN = function(x) next_beauty_number(max(x)))
   
   for(i in seq_along(cols)) {
     p_base <- p_base %>%
-      echarts4r::e_radar_(
+      e_radar_vec(
         serie = names(data_plot)[-1][i], 
         max = max_rate,
         name = names(data_plot)[-1][i]
@@ -295,6 +310,53 @@ plot_radar <- function(data, name_col = "name", cols, theme = "roma") {
     echarts4r::e_theme(theme)
   
   return(p_final)  
+}
+
+#' @title Making .add_indicators work for vectors of maximum values
+
+.add_indicators_vec <- function(e, r.index, max, radar = list()) {
+  if (!length(e$x$opts$radar)) e$x$opts$radar <- list(list())
+  
+  x <- echarts4r:::.get_data(e, e$x$mapping$x)
+  
+  if(length(max) == 1) max <- rep(max, length(x))
+  
+  indicators <- data.frame(name = x, max = max)
+  indicators <- apply(indicators, 1, as.list)
+  e$x$opts$radar[[r.index + 1]] <- radar
+  e$x$opts$radar[[r.index + 1]]$indicator <- indicators
+  e
+}
+
+#' @title Making e_radar_ work for vectors of maximum values
+
+e_radar_vec <- function (e, serie, max = 100, name = NULL, legend = TRUE, rm_x = TRUE, rm_y = TRUE, ..., radar = list()) {
+  r.index <- 0
+  if (missing(e)) {
+    stop("must pass e", call. = FALSE)
+  }
+  if (missing(serie)) {
+    stop("must pass serie", call. = FALSE)
+  }
+  e <- echarts4r:::.rm_axis(e, rm_x, "x")
+  e <- echarts4r:::.rm_axis(e, rm_y, "y")
+  if (is.null(name)) name <- serie
+  
+  vector <- echarts4r:::.get_data(e, serie)
+  series <- purrr::map(e$x$opts$series, "type") %>% unlist()
+  if (!"radar" %in% series) {
+    serie <- list(type = "radar", data = list(list(value = vector, name = name)), radarIndex = r.index, ...)
+    e <- .add_indicators_vec(e, r.index, max, radar = radar)
+    e$x$opts$series <- append(e$x$opts$series, list(serie))
+  }
+  else {
+    e$x$opts$series[[grep("radar", series)]]$data <- append(e$x$opts$series[[grep("radar", series)]]$data, list(list(value = vector, name = name)))
+  }
+  if (isTRUE(legend)) {
+    e$x$opts$legend$data <- append(e$x$opts$legend$data, list(name))
+  }
+  
+  return(e)
 }
 
 #' @title Scale a number to 0-1 scale
@@ -424,6 +486,9 @@ tab_voronoys <- function(text, text_color, background_color, icon, id) {
   )
 }
 
+#' @title Removing button from fileInput
+#' 
+#' @return fileInput HTML code
 
 fileInput2 <- function(inputId, label = NULL, accept = NULL, width = NULL, 
                        buttonLabel = "Browse...", placeholder = "No file selected") {

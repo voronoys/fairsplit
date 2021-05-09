@@ -412,7 +412,8 @@ server <- function(input, output, session) {
     data <- data.frame(metric = split_reactive()$out$metric)
     data$iteration <- 1:nrow(data)
     
-    title <- stringr::str_to_title(string = rhandsontable::hot_to_r(input$df_params)$dist_metric)
+    # title <- stringr::str_to_title(string = rhandsontable::hot_to_r(input$df_params)$dist_metric)
+    title <- "Objective function"
     
     plt_metric <- plotly::plot_ly() %>%
       add_trace(
@@ -423,7 +424,7 @@ server <- function(input, output, session) {
                               '<b>Metric</b>: %{y:.4f}<extra></extra>'),
         type = 'scatter', 
         mode = 'lines'
-    ) %>% 
+      ) %>% 
       layout(
         xaxis = list(title = NULL), 
         yaxis = list(title = title)
@@ -447,5 +448,44 @@ server <- function(input, output, session) {
     )
     
     return(plt_distance)
+  })
+  
+  ## Distance probs
+  output$selected_team_btn <- renderUI({
+    teams <- colnames(split_reactive()$out$best_setting$groups)
+    
+    shinymaterial::material_dropdown(
+      input_id = "selected_team",
+      label = "Select a team", 
+      choices = teams
+    )
+  })
+  
+  output$plot_probs <- renderPlotly({
+    
+    team <- as.numeric(stringr::str_extract(string = input$selected_team, pattern = "[0-9]+"))
+    if(length(team) > 0) {
+      buffer <- rhandsontable::hot_to_r(input$df_params)$buffer
+      
+      data <- split_reactive()
+      probs <- data$out$probs[, team, -(1:(buffer+1))]
+      rownames(probs) <- data$data$id
+      colnames(probs) <- 1:ncol(probs)
+      
+      ranks <- sort(rownames(probs))
+      probs <- probs[ranks, ]
+      
+      plt_probs <- plot_ly(
+        x = colnames(probs),
+        y = rownames(probs), 
+        z = probs, 
+        colors = roma_palette[1:2],
+        hovertemplate = '<b>%{y}</b><br>Probability in iteration %{x}: %{z:.4f}<extra></extra>',
+        type = "heatmap"
+      ) %>% 
+        layout(legend = list(orientation = 'h'))
+      
+      return(plt_probs)
+    }
   })
 }
