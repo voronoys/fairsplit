@@ -15,3 +15,9 @@ Guilherme;pelada/guilherme.jpeg;10;9;7;8;7;9;4
 Pedro;pelada/pedro.jpeg;3;3;5;5;2;2;3
 Sabir;pelada/sabir.jpeg;7;7;7;7;7;7;5
 Rodrygo;pelada/rodrygo.jpeg;5;3;6;7;7;5;4
+Alberto;pelada/alberto.jpeg;5;3;6;6;7;7;6
+Alef;pelada/alef.jpeg;7;7;7;7;7;8;3
+Tiago Cunha;pelada/tiago_cunha.jpeg;6;7;6;7;7;6;3
+Rafael Colares;pelada/rafael_colares.jpeg;6;7;7;7;7;5;3
+Osvaldo;pelada/osvaldo.jpeg;5;5;5;6;7;5;3
+Gabriel Coutinho;pelada/gabriel.jpeg;7;7;6;7;7;7;4

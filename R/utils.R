@@ -103,13 +103,14 @@ split_team <- function(data, n_teams, team_size, weights, n_it, buffer, dist_met
     }
     
     metric_i <- f_obj(data = data, groups = group_aux, weights = weights, dist_metric = dist_metric)$metric
-    metrics[i] <- metric_i
     
     if(metric_i < metric) {
       metric <- metric_i
+      metrics[i] <- metric_i
       groups[, , i] <- group_aux
       probs[, , i] <- probs_aux
     } else {
+      metrics[i] <- metric
       groups[, , i] <- groups[, , (i-1)]
       probs[, , i] <- probs[, , (i-1)]
     }
@@ -126,7 +127,8 @@ split_team <- function(data, n_teams, team_size, weights, n_it, buffer, dist_met
       groups = groups, 
       out = ids_aux, 
       probs = probs,
-      metrics = metrics
+      metrics = metrics,
+      dist_mat = out$dist
     )
   )
 }
@@ -219,6 +221,7 @@ attr_column_def <- function(x, max) {
 #' @return Next beauty number
 
 next_beauty_number <- function(num) {
+  num <- round(num)
   num <- num - 1
   order <- 10^(nchar(num) - 1)
   
@@ -268,21 +271,21 @@ formatter <- function(x) {
 #' @import echarts4r
 #' @return
 
-plot_radar <- function(data, cols, theme = "roma", max_rate = 10) {
+plot_radar <- function(data, name_col = "name", cols, theme = "roma") {
   data_plot <- data %>%
-    dplyr::select(name, !!cols)
-  
-  names(data_plot) <- make.names(names(data_plot))
+    dplyr::select(!!name_col, !!cols)
   
   p_base <- data_plot %>% 
     echarts4r::e_charts(name) 
   
+  max_rate <- next_beauty_number(num = max(data[, -1]))
+  
   for(i in seq_along(cols)) {
     p_base <- p_base %>%
       echarts4r::e_radar_(
-        names(data_plot)[-1][i], 
-        max = max_rate, 
-        names(data_plot)[-1][i]
+        serie = names(data_plot)[-1][i], 
+        max = max_rate,
+        name = names(data_plot)[-1][i]
       ) 
   }
   
@@ -405,11 +408,11 @@ reactable_theme <- function() {
 #' 
 #' @return Box in HTML format
 
-tab_voronoys <- function(text, text_color, background_color, border_color = "#8c77fa", icon, id) {
+tab_voronoys <- function(text, text_color, background_color, icon, id) {
   shiny::HTML(
     paste0(
       '<a id="', id, '" href="#" class="action-button" style="margin-left: 5px; margin-right: 5px">
-       <div class = "voronoys-block" style = "background-color:', background_color, '; border: 2px solid', border_color, ';}"> 
+       <div class = "voronoys-block" style = "background-color:', background_color, ';"> 
           <span class = "name" style = "color:', text_color, '">', text, '</span>
           <div class="img_block">
              <div class="img_block_conteiner">
@@ -421,17 +424,55 @@ tab_voronoys <- function(text, text_color, background_color, border_color = "#8c
   )
 }
 
-action_link <- function(inputId, label, icon, ...) {
-  out <- shiny::tags$li(
-    class="shiny-material-side-nav-tab active", 
-    shiny::a( 
-      id = inputId,
-      href = "#", 
-      class = "action-button", 
-      shiny::icon(icon), 
-      label, 
-      ...
+
+fileInput2 <- function(inputId, label = NULL, accept = NULL, width = NULL, 
+                       buttonLabel = "Browse...", placeholder = "No file selected") {
+  
+  restoredValue <- restoreInput(id = inputId, default = NULL)
+  
+  if (!is.null(restoredValue) && !is.data.frame(restoredValue)) {
+    warning("Restored value for ", inputId, " has incorrect format.")
+    restoredValue <- NULL
+  }
+  
+  if (!is.null(restoredValue)) {
+    restoredValue <- toJSON(restoredValue, strict_atomic = FALSE)
+  }
+  
+  inputTag <- tags$input(
+    id = inputId, 
+    name = inputId, 
+    type = "file", 
+    style = "position: absolute !important; top: -99999px !important; left: -99999px !important;", 
+    `data-restore` = restoredValue
+  )
+  
+  if (length(accept) > 0) 
+    inputTag$attribs$accept <- paste(accept, collapse = ",")
+  
+  div(
+    class = "form-group shiny-input-container", 
+    div(
+      class = "input-group", 
+      tags$label(
+        class = "input-group-btn input-group-prepend",
+        span(
+          "",
+          inputTag
+        )
+      ),
+      tags$input(
+        type = "text",
+        class = "form-control", 
+        style = "border: 1px dotted rgba(0,0,0,0.42) !important; padding: 10px !important;", 
+        placeholder = placeholder, 
+        readonly = "readonly"
+        )
+    ), 
+    tags$div(
+      id = paste(inputId, "_progress", sep = ""), 
+      class = "progress active shiny-file-input-progress", 
+      tags$div(class = "progress-bar")
     )
   )
-  return(out)
 }

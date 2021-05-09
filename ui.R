@@ -1,5 +1,5 @@
 ui <- shinymaterial::material_page(
-  title = "Fair teams",
+  title = "<span><span style = 'color: #3EB8F4'>Fair</span><span style = 'color: #FFA024'>Split</span></span>",
   shiny::tags$head(
     # Styles.css
     shiny::tags$link(rel="stylesheet", href="styles.css", type="text/css"),
@@ -12,183 +12,58 @@ ui <- shinymaterial::material_page(
         });"
     )
   ),
-  # Examples
-  shinymaterial::material_row(
-    shinymaterial::material_column(
-      width = 12,
-      shinymaterial::material_card(
-        title = "Select a toy example or upload your own data!",
-        depth = 2, 
-        divider = TRUE, 
-        shiny::br(),
-        shiny::div(
-          style = "display: flex; justify-content: center;",
-          tab_voronoys(
-            text = "Nossa pelada", 
-            text_color = text_color, 
-            background_color = color_box2, 
-            icon = "bola-icon.png", 
-            id = "real_example"
-          ),
-          tab_voronoys(
-            text = "FIFA20", 
-            text_color = text_color, 
-            background_color = color_box2, 
-            icon = "fifa-icon.png", 
-            id = "fifa_example"
-          ),
-          tab_voronoys(
-            text = "Pokémon attributes", 
-            text_color = text_color, 
-            background_color = color_box2, 
-            icon = "pokemon-icon.png", 
-            id = "pokemon_example"
-          ),
-          tab_voronoys(
-            text = "Company attributes", 
-            text_color = text_color, 
-            background_color = color_box2, 
-            icon = "ca-icon.png", 
-            id = "ca_example"
-          ),
-          tab_voronoys(
-            text = "RStudio toy example", 
-            text_color = text_color, 
-            background_color = color_box2,
-            icon = "rstudio-icon.png",
-            id = "rstudio_example"
-          ),
-          tab_voronoys(
-            text = "Upload", 
-            text_color = text_color, 
-            background_color = color_box2,
-            icon = "upload-icon.png", 
-            id = "upload_data"
-          )
-        )
-      )
-    )
-  ),
-  # Setups
-  shinymaterial::material_row(
-    shiny::conditionalPanel(
-      condition = "input.real_example|input.rstudio_example|input.fifa_example|input.pokemon_example|input.ca_example|input.upload_data",
-      shinymaterial::material_column(
-        width = 4,
-        shinymaterial::material_card(
-          title = shiny::htmlOutput(outputId = "title"),
-          divider = TRUE, 
-          shiny::br(),
-          
-          shiny::p("You can change the configuration of the attributes"),
-          shinycssloaders::withSpinner(ui_element = rhandsontable::rHandsontableOutput(outputId = "df_attr", height = "15em"), type = 8),
-          
-          shiny::p("You can also change the algorithm settings"),
-          shinycssloaders::withSpinner(ui_element = rhandsontable::rHandsontableOutput(outputId = "df_params"), type = 8),
-          
-          shiny::br(),
-          material_button(input_id = "run_example", label = "Run!", icon = NULL),
-          
-          style = "height: 34em"
-        )
+  material_side_nav(
+    fixed = FALSE, 
+    image_source = "img/background.jpeg",
+    material_side_nav_tabs(
+      side_nav_tabs = c(
+        "Home" = "home",
+        "Examples" = "examples",
+        "About" = "about"
       ),
-      shiny::conditionalPanel(
-        condition = "!input.run_example",
-        shinymaterial::material_column(
-          width = 8,
-          shinymaterial::material_card(
-            title = "Algorithm setup",
-            divider = TRUE,
-            shiny::br(),
-            
-            p("Here you can bla bla bla")
-          )
-        )
-      ),
-      # Boxplot
-      shiny::conditionalPanel(
-        condition = "input.run_example",
-        shinymaterial::material_column(
-          width = 8,
-          shinymaterial::material_card(
-            title = "Overall results",
-            divider = TRUE,
-            shinymaterial::material_row(
-              shiny::br(),
-              shinycssloaders::withSpinner(ui_element = plotly::plotlyOutput(outputId = "boxplot_groups_skills"), type = 8)
-            ),
-            style = "height: 34em"
-          )
-        )
-      )
+      icons = c("home", "explore", "question_answer")
     )
   ),
-  # Table
-  shiny::conditionalPanel(
-    condition = "input.run_example",
-    shinymaterial::material_row(
-      shinymaterial::material_column(
-        width = 12, 
-        shinymaterial::material_card(
-          title = "Teams",
-          divider = TRUE,
-          shinymaterial::material_row(
-            shiny::br(),
-            shinycssloaders::withSpinner(ui_element = reactable::reactableOutput(outputId = "tab_groups"), type = 8)
-          )
-        )
-      )
+  material_side_nav_tab_content(
+    side_nav_tab_id = "home",
+    ui_home  
+  ),
+  material_side_nav_tab_content(
+    side_nav_tab_id = "examples",
+    ui_examples,
+    # Modal for the examples
+    shinymaterial::material_modal(
+      modal_id = "params_modal", 
+      display_button = FALSE,
+      title = shiny::htmlOutput(outputId = "title"),
+      
+      shiny::p("You can change the attributes' configuration"),
+      shinycssloaders::withSpinner(ui_element = rhandsontable::rHandsontableOutput(outputId = "df_attr", height = "15em"), type = 8),
+      
+      shiny::p("You can also change the algorithm's settings"),
+      shinycssloaders::withSpinner(ui_element = rhandsontable::rHandsontableOutput(outputId = "df_params"), type = 8),
+      
+      shiny::br(),
+      shinymaterial::material_button(input_id = "run_example", label = "Run!", icon = NULL),
+    ),
+    
+    # Modal for the user data
+    shinymaterial::material_modal(
+      modal_id = "upload_modal",
+      display_button = FALSE,
+      title = "Upload your own dataset",
+      
+      shiny::p("The file must follow the structure: 'id', 'photo', 'attributes'."),
+      fileInput2(inputId = "user_data", accept = c(".txt", ".csv"), placeholder = "Drop a file here!"),
+      shiny::h5("Acceptable extensions: txt and csv. Read the guidelines for a full explanation.", style = "font-size: 1em"),
+      
+      shiny::br(),
+      shinymaterial::material_button(input_id = "upload_file", label = "Upload", icon = NULL)
     )
   ),
-  # About the app
-  shinymaterial::material_row(
-    shinymaterial::material_column(
-      width = 12, 
-      shiny::conditionalPanel(
-        condition = "!input.real_example&!input.rstudio_example&!input.fifa_example&!input.pokemon_example&!input.ca_example&!input.upload_data",
-        material_card(
-          title = "About the fair split",
-          depth = 2,
-          divider = TRUE,
-          shiny::br(),
-          
-          shiny::p(
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-           Praesent placerat ex elit, et finibus justo condimentum quis. Aenean iaculis nec nulla sit amet molestie.
-           Integer augue diam, vulputate quis vestibulum eu, scelerisque id nulla. Sed semper lacus enim, in semper neque pellentesque a.
-           Vestibulum porta faucibus ullamcorper. Nunc vel neque id mi faucibus rutrum. Mauris faucibus orci at sapien pellentesque laoreet.
-           Mauris finibus sapien sed ullamcorper feugiat. Mauris accumsan dolor quis rhoncus malesuada. Etiam vestibulum, est nec ornare congue,
-           augue felis interdum nisi, eu fringilla felis lacus quis arcu. Cras vulputate purus quis fringilla pulvinar.
-           Donec vel neque vitae nisl dictum condimentum. Aenean ut turpis nibh. Proin sit amet orci ligula. Morbi nec dapibus dui.
-           \n
-           Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-           Praesent placerat ex elit, et finibus justo condimentum quis. Aenean iaculis nec nulla sit amet molestie.
-           Integer augue diam, vulputate quis vestibulum eu, scelerisque id nulla. Sed semper lacus enim, in semper neque pellentesque a.
-           Vestibulum porta faucibus ullamcorper. Nunc vel neque id mi faucibus rutrum. Mauris faucibus orci at sapien pellentesque laoreet.
-           Mauris finibus sapien sed ullamcorper feugiat. Mauris accumsan dolor quis rhoncus malesuada. Etiam vestibulum, est nec ornare congue,
-           augue felis interdum nisi, eu fringilla felis lacus quis arcu. Cras vulputate purus quis fringilla pulvinar.
-           Donec vel neque vitae nisl dictum condimentum. Aenean ut turpis nibh. Proin sit amet orci ligula. Morbi nec dapibus dui.
-           \n
-           Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-           Praesent placerat ex elit, et finibus justo condimentum quis. Aenean iaculis nec nulla sit amet molestie.
-           Integer augue diam, vulputate quis vestibulum eu, scelerisque id nulla. Sed semper lacus enim, in semper neque pellentesque a.
-           Vestibulum porta faucibus ullamcorper. Nunc vel neque id mi faucibus rutrum. Mauris faucibus orci at sapien pellentesque laoreet.
-           Mauris finibus sapien sed ullamcorper feugiat. Mauris accumsan dolor quis rhoncus malesuada. Etiam vestibulum, est nec ornare congue,
-           augue felis interdum nisi, eu fringilla felis lacus quis arcu. Cras vulputate purus quis fringilla pulvinar.
-           Donec vel neque vitae nisl dictum condimentum. Aenean ut turpis nibh. Proin sit amet orci ligula. Morbi nec dapibus dui.
-           \n
-           Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-           Praesent placerat ex elit, et finibus justo condimentum quis. Aenean iaculis nec nulla sit amet molestie.
-           Integer augue diam, vulputate quis vestibulum eu, scelerisque id nulla. Sed semper lacus enim, in semper neque pellentesque a.
-           Vestibulum porta faucibus ullamcorper. Nunc vel neque id mi faucibus rutrum. Mauris faucibus orci at sapien pellentesque laoreet.
-           Mauris finibus sapien sed ullamcorper feugiat. Mauris accumsan dolor quis rhoncus malesuada. Etiam vestibulum, est nec ornare congue,
-           augue felis interdum nisi, eu fringilla felis lacus quis arcu. Cras vulputate purus quis fringilla pulvinar.
-           Donec vel neque vitae nisl dictum condimentum. Aenean ut turpis nibh. Proin sit amet orci ligula. Morbi nec dapibus dui.",
-            style = "color: grey; padding-left: 50px;text-align: justify; padding-right: 50px;"
-          )
-        )
-      )
-    )
+  material_side_nav_tab_content(
+    side_nav_tab_id = "about",
+    ui_about
   ),
   shiny::br(),
   # Footer
@@ -199,7 +74,8 @@ ui <- shinymaterial::material_page(
              bottom:0;
              right:0;
              left:0;
-             background: #8c77fa;
+             transition: none 0s ease 0s;
+             background-color: rgba(249, 250, 253, 0.3);
              color: white;
              padding:20px;
              box-sizing:border-box;

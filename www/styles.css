@@ -1,10 +1,14 @@
 nav {
   color: #fff;
-  background-color: #8c77fa;
+  background-image: none;
+  transition: none 0s ease 0s;
+  background-color: rgba(249, 250, 253, 0);
 }
 
 body {
-  background-color: #f7f8cc !important;
+  background-image: url(img/background.jpeg);
+  background-position: right top;
+  background-size: cover;
 }
 
 .voronoys-block {
@@ -73,4 +77,29 @@ body {
 .ui.button:hover {
     background-color: #000;
     color: #fff;
+}
+
+.about {
+  color: grey; 
+  padding-left: 50px;
+  text-align: justify; 
+  padding-right: 50px;
+}
+
+.col .row {
+    margin-left: .75rem;
+    margin-right: .75rem;
+}
+
+.swal2-popup .swal2-title {
+    font-size: 1.2em !important;
+}
+
+.swal2-popup #swal2-content {
+    text-align: center !important;
+    font-size: 0.5em !important;
+}
+
+.swal2-popup .swal2-styled.swal2-confirm {
+    font-size: 0.8em !important;
 }
