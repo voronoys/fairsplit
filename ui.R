@@ -98,5 +98,8 @@ ui <- shinymaterial::material_page(
              box-sizing:border-box;
              z-index: 1000;
              text-align: right"
+  ),
+  div(class = "footer",
+      div(includeHTML("html/google_analytics.html"))
   )
 )

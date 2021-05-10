@@ -14,8 +14,8 @@ body {
 .voronoys-block {
     position: relative;
     display: table;
-    width: 230px;
-    height: 130px;
+    width: 17em;
+    height: 9em;
     margin-bottom: 10px;
     font-weight: 700;
     border-radius: 7px;

@@ -75,7 +75,8 @@ ui_examples <- shiny::tagList(
               shinymaterial::material_card(
                 title = "Skills",
                 divider = TRUE,
-                shinycssloaders::withSpinner(ui_element = plotly::plotlyOutput(outputId = "boxplot_groups_skills"), type = 8)
+                br(),
+                shinycssloaders::withSpinner(ui_element = plotly::plotlyOutput(outputId = "plot_groups_skills"), type = 8)
               )
             ),
             # Radar
@@ -84,7 +85,8 @@ ui_examples <- shiny::tagList(
               shinymaterial::material_card(
                 title = "Comparison",
                 divider = TRUE,
-                shinycssloaders::withSpinner(ui_element = echarts4r::echarts4rOutput(outputId = "radar_teams"), type = 8)
+                br(),
+                shinycssloaders::withSpinner(ui_element = echarts4r::echarts4rOutput(outputId = "plot_teams_radar"), type = 8)
               )
             ),
             # Table
@@ -93,6 +95,7 @@ ui_examples <- shiny::tagList(
               shinymaterial::material_card(
                 title = "Teams",
                 divider = TRUE,
+                br(),
                 shinycssloaders::withSpinner(ui_element = reactable::reactableOutput(outputId = "tab_groups"), type = 8)
               )
             )
@@ -107,33 +110,60 @@ ui_examples <- shiny::tagList(
         shinymaterial::material_card(
           title = "Individuals",
           divider = TRUE,
-          shinymaterial::material_row(
-            shiny::br(),
-            # ??
-            shinymaterial::material_column(
-              width = 4, 
-              shinymaterial::material_card(
-                title = "Metric's over iterations",
-                divider = TRUE,
-                # shinycssloaders::withSpinner(ui_element = plotly::plotlyOutput(outputId = "plot_metric"), type = 8)
+          shinymaterial::material_card(
+            shinymaterial::material_row(
+              shinymaterial::material_column(
+                width = 4,
+                shinymaterial::material_dropdown(
+                  input_id = "selected_ids", 
+                  label = "Select the individuals to display",
+                  choices = NULL,
+                  selected = NULL, 
+                  multiple = TRUE
+                )
+              ),
+              shinymaterial::material_column(
+                width = 4,
+                shinymaterial::material_dropdown(
+                  input_id = "selected_attrs", 
+                  label = "Select two attributes to display",
+                  choices = NULL,
+                  selected = NULL, 
+                  multiple = TRUE
+                )
               )
             ),
-            # ??
-            shinymaterial::material_column(
-              width = 4, 
-              shinymaterial::material_card(
-                title = "Distance matrix",
-                divider = TRUE,
-                # shinycssloaders::withSpinner(ui_element = plotly::plotlyOutput(outputId = "plot_distance"), type = 8)
-              )
-            ),
-            # ??
-            shinymaterial::material_column(
-              width = 4, 
-              shinymaterial::material_card(
-                title = "Distance matrix",
-                divider = TRUE,
-                # shinycssloaders::withSpinner(ui_element = plotly::plotlyOutput(outputId = "plot_distance"), type = 8)
+            shinymaterial::material_row(
+              shiny::br(),
+              # Distance
+              shinymaterial::material_column(
+                width = 4, 
+                shinymaterial::material_card(
+                  title = "Distance between individuals",
+                  divider = TRUE,
+                  shiny::br(),
+                  shinycssloaders::withSpinner(ui_element = plotly::plotlyOutput(outputId = "plot_id_distance"), type = 8)
+                )
+              ),
+              # Dispersion
+              shinymaterial::material_column(
+                width = 4, 
+                shinymaterial::material_card(
+                  title = "Individuals dispersion",
+                  divider = TRUE,
+                  shiny::br(),
+                  shinycssloaders::withSpinner(ui_element = plotly::plotlyOutput(outputId = "plot_id_dispersion"), type = 8)
+                )
+              ),
+              # Radar
+              shinymaterial::material_column(
+                width = 4, 
+                shinymaterial::material_card(
+                  title = "Comparison",
+                  divider = TRUE,
+                  shiny::br(),
+                  shinycssloaders::withSpinner(ui_element = echarts4r::echarts4rOutput(outputId = "plot_id_radar"), type = 8)
+                )
               )
             )
           )
@@ -153,7 +183,7 @@ ui_examples <- shiny::tagList(
             shinymaterial::material_column(
               width = 4, 
               shinymaterial::material_card(
-                title = "Metric's over iterations",
+                title = "Metric over iterations",
                 divider = TRUE,
                 shiny::br(),
                 shinycssloaders::withSpinner(ui_element = plotly::plotlyOutput(outputId = "plot_metric"), type = 8)
@@ -171,18 +201,12 @@ ui_examples <- shiny::tagList(
             ),
             # Probability
             shinymaterial::material_column(
-              width = 12, 
-              shinymaterial::material_column(
-                width = 3,
-                shiny::uiOutput(outputId = "selected_team_btn")
-              ),
-              shinymaterial::material_column(
-                width = 12,
-                shinymaterial::material_card(
-                  title = "Inclusion probability by team",
-                  divider = TRUE,
-                  shinycssloaders::withSpinner(ui_element = plotly::plotlyOutput(outputId = "plot_probs", height = "90%"), type = 8)
-                )
+              width = 4,
+              shinymaterial::material_card(
+                title = "Probability per team",
+                divider = TRUE,
+                shiny::br(),
+                shinycssloaders::withSpinner(ui_element = plotly::plotlyOutput(outputId = "plot_probs"), type = 8)
               )
             )
           )

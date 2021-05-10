@@ -354,7 +354,7 @@ server <- function(input, output, session) {
   })
   
   ## Skills: boxplot
-  output$boxplot_groups_skills <- plotly::renderPlotly({
+  output$plot_groups_skills <- plotly::renderPlotly({
     # Data
     out <- data_full()
     description <- out$description
@@ -369,14 +369,25 @@ server <- function(input, output, session) {
     data <- data %>%
       tidyr::pivot_longer(cols = where(is.numeric), names_to = "skill", values_to = "rate")
     
-    plt_skills <- plot_ly(data = data, y = ~rate, x = ~skill, color = ~team, colors = roma_palette, type = "box") %>% 
-      layout(xaxis = list(title = NULL), yaxis = list(title = "Rate"), boxmode = "group")
+    plt <- plot_ly(
+      data = data, 
+      y = ~rate, 
+      x = ~skill, 
+      color = ~team,
+      colors = roma_palette,
+      type = "box"
+    ) %>% 
+      layout(
+        xaxis = list(title = NULL), 
+        yaxis = list(title = "Rate"), 
+        boxmode = "group"
+      )
     
-    return(plt_skills)
+    return(plt)
   })
   
   ## Radar
-  output$radar_teams <- echarts4r::renderEcharts4r({
+  output$plot_teams_radar <- echarts4r::renderEcharts4r({
     out <- data_full()
     
     data <- out$data %>%
@@ -398,13 +409,132 @@ server <- function(input, output, session) {
       dplyr::arrange(rank) %>%
       select(-rank)
     
-    plot_radar(data = data, cols = names(data)[-1])
+    plt <- plot_radar(data = data, cols = names(data)[-1])
+    
+    return(plt)
   })
   
-  # Individuals
-  ## Distance matrix
+  # Available ids and attributes
+  observeEvent(input$run_example, {
+    ids <- as.character(data_example()$original_data$id)
+    attrs <- names(data_example()$original_data)[-(1:2)]
+    
+    update_material_dropdown_multiple(
+      session = session,
+      input_id = "selected_ids",
+      choices = ids,
+      value = ids[1:5]
+    )
+    
+    update_material_dropdown_multiple(
+      session = session,
+      input_id = "selected_attrs",
+      choices = attrs,
+      value = attrs[1:2]
+    )
+  }, ignoreNULL = TRUE, ignoreInit = TRUE)
   
-  ## Graph
+  ## Distance matrix
+  output$plot_id_distance <- renderPlotly({
+    ids <- input$selected_ids
+    
+    if(length(ids) > 0) {
+      data <- data_example()$original_data %>%
+        dplyr::select(-photo) %>%
+        dplyr::filter(id %in% ids)
+      
+      metric <- rhandsontable::hot_to_r(input$df_params)$dist_metric
+      w <- rhandsontable::hot_to_r(input$df_attr)$Weight
+      
+      data_aux <- data[, -1]
+      rownames(data_aux) <- data$id
+      
+      if(metric == "cosine") {
+        data <- as.matrix(cosine(x = data_aux, weights = w))
+      } else {
+        data <- as.matrix(euclidean(x = data_aux, weights = w))
+      }
+      
+      data[upper.tri(data)] <- NA
+      
+      plt <- plot_ly(
+        x = colnames(data),
+        y = rownames(data), 
+        z = data, 
+        colors = roma_palette[3:4],
+        hovertemplate = 'Distance between %{y} and %{x}: %{z:.4f}<extra></extra>',
+        type = "heatmap"
+      )
+      
+      return(plt)
+    }
+  })
+  
+  ## Individuals dispersion
+  output$plot_id_dispersion <- renderPlotly({
+    ids <- input$selected_ids
+    attrs <- input$selected_attrs
+    
+    if(length(attrs) == 1) attrs <- c(attrs, attrs)
+    if(length(attrs) > 2) attrs <- attrs[1:2]
+    
+    if(length(ids) > 0 & length(attrs) > 0) {
+      maxs <- rhandsontable::hot_to_r(input$df_attr) %>%
+        dplyr::filter(Variable %in% attrs) %>%
+        .$Maximum
+      
+      data <- data_example()$original_data %>%
+        dplyr::select(-photo) %>%
+        dplyr::filter(id %in% ids) %>%
+        dplyr::select(id, !!attrs)
+      
+      plt <- plot_ly(
+        data = data,
+        x = ~eval(expr = parse(text = attrs[1])),
+        y = ~eval(expr = parse(text = attrs[2])),
+        color = ~id, 
+        text = paste0('<b>', data$id, '</b><br>', attrs[1],': ', data[, attrs[1]], '<br>', attrs[2], ': ', data[, attrs[1]]),
+        hoverinfo = 'text',
+        colors = roma_palette,
+        type = "scatter", mode = "markers"
+      ) %>%
+        layout(
+          xaxis = list(title = stringr::str_to_title(attrs[1]), range = c(0, maxs[1])),
+          yaxis = list(title = stringr::str_to_title(attrs[2]), range = c(0, maxs[2]))
+        )
+      
+      return(plt)
+    }
+  })
+  
+  ## Radar
+  output$plot_id_radar <- echarts4r::renderEcharts4r({
+    ids <- input$selected_ids
+    
+    if(length(ids) > 0) {
+      data <- data_example()$original_data %>%
+        dplyr::select(-photo) %>%
+        dplyr::filter(id %in% ids)
+      
+      data <- data %>%
+        dplyr::group_by(id) %>%
+        dplyr::summarise(dplyr::across(.cols = everything(), .fns = function(x) round(mean(x), 2))) %>%
+        dplyr::ungroup() %>%
+        tidyr::pivot_longer(cols = !id) %>%
+        tidyr::pivot_wider(id_cols = name, names_from = id, values_from = value) %>%
+        dplyr::mutate(name = stringr::str_to_title(name))
+      
+      data$rank <- rank(rowMeans(data[, -1]), ties.method = "random")
+      
+      data <- data %>%
+        dplyr::arrange(rank) %>%
+        select(-rank)
+      
+      plt <- plot_radar(data = data, cols = names(data)[-1])
+      
+      return(plt)
+    }
+  })
   
   # Algorithm
   ## Metric's time series
@@ -415,7 +545,7 @@ server <- function(input, output, session) {
     # title <- stringr::str_to_title(string = rhandsontable::hot_to_r(input$df_params)$dist_metric)
     title <- "Objective function"
     
-    plt_metric <- plotly::plot_ly() %>%
+    plt <- plotly::plot_ly() %>%
       add_trace(
         data = data,
         y = ~metric, x = ~iteration, 
@@ -430,7 +560,7 @@ server <- function(input, output, session) {
         yaxis = list(title = title)
       )
     
-    return(plt_metric)
+    return(plt)
   })
   
   ## Distance matrix
@@ -438,54 +568,47 @@ server <- function(input, output, session) {
     data <- split_reactive()$out$dist
     data[upper.tri(data)] <- NA
     
-    plt_distance <- plot_ly(
+    plt <- plot_ly(
       x = colnames(data),
       y = rownames(data), 
       z = data, 
-      colors = roma_palette[1:2],
+      colors = roma_palette[3:4],
       hovertemplate = 'Distance between %{y} and %{x}: %{z:.4f}<extra></extra>',
       type = "heatmap"
     )
     
-    return(plt_distance)
+    return(plt)
   })
   
   ## Distance probs
-  output$selected_team_btn <- renderUI({
-    teams <- colnames(split_reactive()$out$best_setting$groups)
-    
-    shinymaterial::material_dropdown(
-      input_id = "selected_team",
-      label = "Select a team", 
-      choices = teams
-    )
-  })
-  
   output$plot_probs <- renderPlotly({
+    data <- split_reactive()
+    probs <- data$out$probs[, , dim(data$out$probs)[3]]
+    rownames(probs) <- data$data$id
+    colnames(probs) <- paste("Team", 1:ncol(probs))
     
-    team <- as.numeric(stringr::str_extract(string = input$selected_team, pattern = "[0-9]+"))
-    if(length(team) > 0) {
-      buffer <- rhandsontable::hot_to_r(input$df_params)$buffer
-      
-      data <- split_reactive()
-      probs <- data$out$probs[, team, -(1:(buffer+1))]
-      rownames(probs) <- data$data$id
-      colnames(probs) <- 1:ncol(probs)
-      
-      ranks <- sort(rownames(probs))
-      probs <- probs[ranks, ]
-      
-      plt_probs <- plot_ly(
-        x = colnames(probs),
-        y = rownames(probs), 
-        z = probs, 
-        colors = roma_palette[1:2],
-        hovertemplate = '<b>%{y}</b><br>Probability in iteration %{x}: %{z:.4f}<extra></extra>',
-        type = "heatmap"
-      ) %>% 
-        layout(legend = list(orientation = 'h'))
-      
-      return(plt_probs)
-    }
+    df_probs <- data.frame(probs, check.names = FALSE) %>% 
+      dplyr::mutate(
+        rownames = rownames(.),
+        total = rowSums(across(where(is.numeric)))
+      ) %>%
+      dplyr::filter(total > 0) %>%
+      dplyr::select(-total) %>%
+      dplyr::arrange(dplyr::across(dplyr::starts_with("Team")))
+    
+    rownames(df_probs) <- df_probs$rownames
+    
+    probs <- as.matrix(df_probs %>% select(-rownames))
+    
+    plt <- plot_ly(
+      x = colnames(probs),
+      y = rownames(probs), 
+      z = probs, 
+      colors = roma_palette[3:4],
+      hovertemplate = '<b>%{y}</b><br>Probability to be in %{x}: %{z:.2f}<extra></extra>',
+      type = "heatmap"
+    )
+    
+    return(plt)
   })
 }

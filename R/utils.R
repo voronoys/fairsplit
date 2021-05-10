@@ -118,16 +118,15 @@ split_team <- function(data, n_teams, team_size, weights, n_it, buffer, dist_met
     }
     
     metric_i <- f_obj(data = data, groups = group_aux, weights = weights, dist_metric = dist_metric)$metric
+    probs[, , i] <- probs_aux
     
     if(metric_i < metric) {
       metric <- metric_i
       metrics[i] <- metric_i
       groups[, , i] <- group_aux
-      probs[, , i] <- probs_aux
     } else {
       metrics[i] <- metric
       groups[, , i] <- groups[, , (i-1)]
-      probs[, , i] <- probs[, , (i-1)]
     }
   }
   
@@ -540,4 +539,52 @@ fileInput2 <- function(inputId, label = NULL, accept = NULL, width = NULL,
       tags$div(class = "progress-bar")
     )
   )
+}
+
+# https://github.com/ericrayanderson/shinymaterial/blob/0254f96c7dbb9374b8a2fd9ec7b24bcae73ae68d/R/update-shiny-material-dropdown.R
+update_material_dropdown_multiple <- function(session, input_id, value = NULL, choices = NULL){
+  if(is.null(value)) {
+    message("ERROR: Must include 'value' with update_material_dropdown")
+    return(NULL)
+  }
+  
+  if(!is.null(choices)){
+    
+    if(is.null(names(choices)))
+      names(choices) <- choices
+    
+    if(!all(value %in% choices)) {
+      for(ele in value[!value %in% choices])
+        message("ERROR: value '", ele, "' not found in choices")
+      return(NULL)
+    }
+    
+    choices <- gsub(pattern = " ", replacement = "_shinymaterialdropdownspace_", x = choices, fixed = TRUE)
+    
+    choices_value_js_code <- paste0(
+      paste0("$('#", input_id, "').empty(); $('#", input_id, "')"),
+      paste0('.append(\'<option value="', choices, '">&nbsp;', names(choices), "</option>')", collapse = "")
+    )
+    
+    session$sendCustomMessage(type = "shinymaterialJS", choices_value_js_code)
+    
+    choices_label_js_code <- paste0(
+      "$('#shiny-material-dropdown-", input_id, "').find('ul').empty();",
+      "$('#shiny-material-dropdown-", input_id, "').find('ul')",
+      paste0(".append('<li><span>&nbsp;", names(choices), "</span></li>')", collapse = "")
+    )
+    
+    session$sendCustomMessage(type = "shinymaterialJS", choices_label_js_code)
+    
+  }
+  
+  valueShow <- gsub(pattern = " ", replacement = "_shinymaterialdropdownspace_", x = value, fixed = TRUE)
+  
+  value_js_code <- paste0(
+    paste0("$('#", input_id, "').find('option[value=\"", valueShow, "\"]').prop('selected', true);", collapse = ""), 
+    "$('#", input_id, "').formSelect();",
+    "Shiny.onInputChange('", input_id, "', ['", paste0(value, collapse = "','"), "']);"
+  )
+  
+  session$sendCustomMessage(type = "shinymaterialJS", value_js_code)
 }
