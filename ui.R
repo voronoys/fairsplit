@@ -12,8 +12,9 @@ ui <- shinymaterial::material_page(
         });"
     )
   ),
-  material_side_nav(
-    fixed = FALSE, 
+  shinyjs::useShinyjs(),
+  shinymaterial::material_side_nav(
+    # fixed = FALSE, 
     image_source = "img/background.jpeg",
     material_side_nav_tabs(
       side_nav_tabs = c(
@@ -24,7 +25,7 @@ ui <- shinymaterial::material_page(
       icons = c("home", "explore", "question_answer")
     )
   ),
-  material_side_nav_tab_content(
+  shinymaterial::material_side_nav_tab_content(
     side_nav_tab_id = "home",
     ui_home  
   ),
@@ -61,7 +62,7 @@ ui <- shinymaterial::material_page(
       shinymaterial::material_button(input_id = "upload_file", label = "Upload", icon = NULL)
     )
   ),
-  material_side_nav_tab_content(
+  shinymaterial::material_side_nav_tab_content(
     side_nav_tab_id = "about",
     ui_about
   ),

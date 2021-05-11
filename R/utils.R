@@ -285,20 +285,20 @@ formatter <- function(x) {
 #' @import echarts4r
 #' @return
 
-plot_radar <- function(data, name_col = "name", cols, theme = "roma") {
+plot_radar <- function(data, name_col = "name", cols, theme = "roma", max_vec = NULL) {
   data_plot <- data %>%
     dplyr::select(!!name_col, !!cols)
   
   p_base <- data_plot %>% 
     echarts4r::e_charts(name) 
   
-  max_rate <- apply(X = data[, -1], MARGIN = 1, FUN = function(x) next_beauty_number(max(x)))
+  if(is.null(max_vec))  max_vec <- apply(X = data[, -1], MARGIN = 1, FUN = function(x) next_beauty_number(max(x)))
   
   for(i in seq_along(cols)) {
     p_base <- p_base %>%
       e_radar_vec(
         serie = names(data_plot)[-1][i], 
-        max = max_rate,
+        max = max_vec,
         name = names(data_plot)[-1][i]
       ) 
   }
@@ -477,7 +477,7 @@ tab_voronoys <- function(text, text_color, background_color, icon, id) {
           <span class = "name" style = "color:', text_color, '">', text, '</span>
           <div class="img_block">
              <div class="img_block_conteiner">
-                <img src="img/', icon,'" style="width: 6em; margin: 10px 10px 10px 20px; opacity: 0.9;">
+                <img src="img/', icon,'" style="max-width: 8vh; margin: 10px 10px 10px 20px; opacity: 0.9;">
              </div>
           </div>
        </div></a>'

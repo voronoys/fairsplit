@@ -1,4 +1,4 @@
-id;photo;pace;shooting;dribbling;passing;defending;physical;goalkeeping
+id;photo;pace;shooting;dribbling;passing;defending;physic;goalkeeping
 Douglas;pelada/douglas.jpeg;8;6;8;8;7;7;3
 Luís;pelada/luis.jpeg;6;9;8;8;7;6;4
 Augusto;pelada/augusto.jpeg;7;8;7;8;8;7;4

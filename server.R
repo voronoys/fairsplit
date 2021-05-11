@@ -52,7 +52,7 @@ server <- function(input, output, session) {
           team_size <- 10L
         }
         if(changed == "ca_example") {
-          data <- read.table(file = "data/company.txt", header = TRUE, sep = ";", check.names = FALSE)
+          data <- read.table(file = "data/company.txt", header = TRUE, sep = ";", check.names = TRUE)
           title <- "Company skils"
           n_teams <- 3L
           team_size <- 5L
@@ -139,7 +139,7 @@ server <- function(input, output, session) {
       output$df_attr <- rhandsontable::renderRHandsontable({
         attrs <- data.frame(
           Variable = vars, 
-          Description = stringr::str_to_title(vars), 
+          Description = stringr::str_to_title(stringr::str_replace_all(string = vars, pattern = "\\.", replacement = " ")), 
           Weight = 1, 
           Maximum = max_scale, 
           row.names = NULL, 
@@ -401,6 +401,7 @@ server <- function(input, output, session) {
       dplyr::ungroup() %>%
       tidyr::pivot_longer(cols = !team) %>%
       tidyr::pivot_wider(id_cols = name, names_from = team, values_from = value) %>%
+      dplyr::left_join(rhandsontable::hot_to_r(input$df_attr)[, c("Variable", "Maximum")], by = c("name" = "Variable")) %>%
       dplyr::mutate(name = stringr::str_to_title(name))
     
     data$rank <- rank(rowMeans(data[, -1]), ties.method = "random")
@@ -409,23 +410,50 @@ server <- function(input, output, session) {
       dplyr::arrange(rank) %>%
       select(-rank)
     
-    plt <- plot_radar(data = data, cols = names(data)[-1])
+    max_vec <- data$Maximum
+    data <- data %>% select(-Maximum)
+    
+    plt <- plot_radar(data = data, cols = names(data)[-1], max = max_vec)
     
     return(plt)
   })
   
   # Available ids and attributes
-  observeEvent(input$run_example, {
-    ids <- as.character(data_example()$original_data$id)
-    attrs <- names(data_example()$original_data)[-(1:2)]
+  observeEvent(c(input$run_example, input$selected_teams), {
+    teams <- levels(data_full()$data$team)
+    ids <- levels(data_full()$data$id)
+    attrs <- names(data_full()$data)[-(1:3)]
     
+    changed <- shiny::req(input$changed)
+    
+    # Update teams
+    if(changed != "selected_teams") {
+      update_material_dropdown_multiple(
+        session = session,
+        input_id = "selected_teams",
+        choices = c("All", teams),
+        value = "All"
+      )
+    }
+    
+    # Update ids
+    if(input$selected_teams == "All") {
+      ids_sel <- ids[1:5]
+    } else {
+      ids_sel <- data_full()$data %>%
+        dplyr::filter(team == input$selected_teams) %>%
+        .$id %>%
+        as.character()
+    }
+      
     update_material_dropdown_multiple(
       session = session,
       input_id = "selected_ids",
       choices = ids,
-      value = ids[1:5]
+      value = ids_sel
     )
     
+    # Update attributes
     update_material_dropdown_multiple(
       session = session,
       input_id = "selected_attrs",
@@ -438,7 +466,7 @@ server <- function(input, output, session) {
   output$plot_id_distance <- renderPlotly({
     ids <- input$selected_ids
     
-    if(length(ids) > 0) {
+    if(length(ids) > 1) {
       data <- data_example()$original_data %>%
         dplyr::select(-photo) %>%
         dplyr::filter(id %in% ids)
@@ -461,7 +489,7 @@ server <- function(input, output, session) {
         x = colnames(data),
         y = rownames(data), 
         z = data, 
-        colors = roma_palette[3:4],
+        colors = roma_palette[c(11, 2)],
         hovertemplate = 'Distance between %{y} and %{x}: %{z:.4f}<extra></extra>',
         type = "heatmap"
       )
@@ -479,7 +507,7 @@ server <- function(input, output, session) {
     if(length(attrs) > 2) attrs <- attrs[1:2]
     
     if(length(ids) > 0 & length(attrs) > 0) {
-      maxs <- rhandsontable::hot_to_r(input$df_attr) %>%
+      max_vec <- rhandsontable::hot_to_r(input$df_attr) %>%
         dplyr::filter(Variable %in% attrs) %>%
         .$Maximum
       
@@ -493,14 +521,14 @@ server <- function(input, output, session) {
         x = ~eval(expr = parse(text = attrs[1])),
         y = ~eval(expr = parse(text = attrs[2])),
         color = ~id, 
-        text = paste0('<b>', data$id, '</b><br>', attrs[1],': ', data[, attrs[1]], '<br>', attrs[2], ': ', data[, attrs[1]]),
-        hoverinfo = 'text',
         colors = roma_palette,
+        text = paste0('<b>', data$id, '</b><br>', attrs[1],': ', data[, attrs[1]], '<br>', attrs[2], ': ', data[, attrs[2]]),
+        hoverinfo = 'text',
         type = "scatter", mode = "markers"
       ) %>%
         layout(
-          xaxis = list(title = stringr::str_to_title(attrs[1]), range = c(0, maxs[1])),
-          yaxis = list(title = stringr::str_to_title(attrs[2]), range = c(0, maxs[2]))
+          xaxis = list(title = stringr::str_to_title(attrs[1]), range = c(0, 1.01*max_vec[1])),
+          yaxis = list(title = stringr::str_to_title(attrs[2]), range = c(0, 1.01*max_vec[2]))
         )
       
       return(plt)
@@ -522,6 +550,7 @@ server <- function(input, output, session) {
         dplyr::ungroup() %>%
         tidyr::pivot_longer(cols = !id) %>%
         tidyr::pivot_wider(id_cols = name, names_from = id, values_from = value) %>%
+        dplyr::left_join(rhandsontable::hot_to_r(input$df_attr)[, c("Variable", "Maximum")], by = c("name" = "Variable")) %>%
         dplyr::mutate(name = stringr::str_to_title(name))
       
       data$rank <- rank(rowMeans(data[, -1]), ties.method = "random")
@@ -530,7 +559,10 @@ server <- function(input, output, session) {
         dplyr::arrange(rank) %>%
         select(-rank)
       
-      plt <- plot_radar(data = data, cols = names(data)[-1])
+      max_vec <- data$Maximum
+      data <- data %>% select(-Maximum)
+      
+      plt <- plot_radar(data = data, cols = names(data)[-1], max = max_vec)
       
       return(plt)
     }
@@ -572,7 +604,7 @@ server <- function(input, output, session) {
       x = colnames(data),
       y = rownames(data), 
       z = data, 
-      colors = roma_palette[3:4],
+      colors = roma_palette[c(11, 2)],
       hovertemplate = 'Distance between %{y} and %{x}: %{z:.4f}<extra></extra>',
       type = "heatmap"
     )
@@ -604,7 +636,7 @@ server <- function(input, output, session) {
       x = colnames(probs),
       y = rownames(probs), 
       z = probs, 
-      colors = roma_palette[3:4],
+      colors = roma_palette[c(11, 2)],
       hovertemplate = '<b>%{y}</b><br>Probability to be in %{x}: %{z:.2f}<extra></extra>',
       type = "heatmap"
     )

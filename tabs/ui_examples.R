@@ -8,49 +8,66 @@ ui_examples <- shiny::tagList(
         depth = 2, 
         divider = TRUE, 
         shiny::br(),
-        shiny::div(
-          style = "display: flex; justify-content: center;",
-          tab_voronoys(
-            text = "Nossa pelada", 
-            text_color = text_color, 
-            background_color = color_box, 
-            icon = "bola-icon.png", 
-            id = "real_example"
+        shinymaterial::material_row(
+          shinymaterial::material_column(
+            width = 2,
+            tab_voronoys(
+              text = "Nossa pelada", 
+              text_color = text_color, 
+              background_color = color_box, 
+              icon = "bola-icon.png", 
+              id = "real_example"
+            )
           ),
-          tab_voronoys(
-            text = "FIFA20", 
-            text_color = text_color, 
-            background_color = color_box, 
-            icon = "fifa-icon.png", 
-            id = "fifa_example"
+          shinymaterial::material_column(
+            width = 2,
+            tab_voronoys(
+              text = "FIFA20", 
+              text_color = text_color, 
+              background_color = color_box, 
+              icon = "fifa-icon.png", 
+              id = "fifa_example"
+            )
           ),
-          tab_voronoys(
-            text = "Pokémon attributes", 
-            text_color = text_color, 
-            background_color = color_box, 
-            icon = "pokemon-icon.png", 
-            id = "pokemon_example"
+          shinymaterial::material_column(
+            width = 2,
+            tab_voronoys(
+              text = "Pokémon attributes", 
+              text_color = text_color, 
+              background_color = color_box, 
+              icon = "pokemon-icon.png", 
+              id = "pokemon_example"
+            )
           ),
-          tab_voronoys(
-            text = "Company attributes", 
-            text_color = text_color, 
-            background_color = color_box, 
-            icon = "ca-icon.png", 
-            id = "ca_example"
+          shinymaterial::material_column(
+            width = 2,
+            tab_voronoys(
+              text = "Company attributes", 
+              text_color = text_color, 
+              background_color = color_box, 
+              icon = "ca-icon.png", 
+              id = "ca_example"
+            )
           ),
-          tab_voronoys(
-            text = "RStudio toy example", 
-            text_color = text_color, 
-            background_color = color_box,
-            icon = "rstudio-icon.png",
-            id = "rstudio_example"
+          shinymaterial::material_column(
+            width = 2,
+            tab_voronoys(
+              text = "RStudio toy example", 
+              text_color = text_color, 
+              background_color = color_box,
+              icon = "rstudio-icon.png",
+              id = "rstudio_example"
+            )
           ),
-          tab_voronoys(
-            text = "Upload", 
-            text_color = text_color, 
-            background_color = color_box,
-            icon = "upload-icon.png", 
-            id = "upload_data"
+          shinymaterial::material_column(
+            width = 2,
+            tab_voronoys(
+              text = "Upload", 
+              text_color = text_color, 
+              background_color = color_box,
+              icon = "upload-icon.png", 
+              id = "upload_data"
+            )
           )
         )
       )
@@ -115,8 +132,18 @@ ui_examples <- shiny::tagList(
               shinymaterial::material_column(
                 width = 4,
                 shinymaterial::material_dropdown(
-                  input_id = "selected_ids", 
-                  label = "Select the individuals to display",
+                  input_id = "selected_teams", 
+                  label = "Select the teams to filter and display",
+                  choices = "All",
+                  selected = "All", 
+                  multiple = FALSE
+                )
+              ),
+              shinymaterial::material_column(
+                width = 4,
+                shinymaterial::material_dropdown(
+                  input_id = "selected_attrs", 
+                  label = "Select two attributes to display",
                   choices = NULL,
                   selected = NULL, 
                   multiple = TRUE
@@ -125,8 +152,8 @@ ui_examples <- shiny::tagList(
               shinymaterial::material_column(
                 width = 4,
                 shinymaterial::material_dropdown(
-                  input_id = "selected_attrs", 
-                  label = "Select two attributes to display",
+                  input_id = "selected_ids", 
+                  label = "Select the individuals to display",
                   choices = NULL,
                   selected = NULL, 
                   multiple = TRUE
