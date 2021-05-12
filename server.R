@@ -124,7 +124,7 @@ server <- function(input, output, session) {
     
     if(!is.null(data)) {
       # Guessing the data sacle
-      max_scale <- apply(X = data[, -c(1, 2)], MARGIN = 2, FUN = function(x) next_beauty_number(max(x)))
+      max_scale <- apply(X = data[, -c(1, 2)], MARGIN = 2, FUN = function(x) as.integer(next_beauty_number(max(x))))
       min_scale <- max_scale*0
       
       vars <- names(data[, -c(1, 2)])
@@ -162,23 +162,19 @@ server <- function(input, output, session) {
       params <- data.frame(
         n_teams = n_teams, 
         team_size = team_size, 
-        n_it = 200L, 
-        buffer = 100L, 
-        dist_metric = "cosine"
+        n_it = 300L
       )
       
       output$df_params <- rhandsontable::renderRHandsontable({
         tab <- rhandsontable::rhandsontable(
           data = params, 
-          colHeaders = c("# Teams", "Team size", "# Iterations", "Buffer", "Metric"),
+          colHeaders = c("# Teams", "Team size", "# Iterations"),
           rowHeaders = FALSE,
           stretchH = "all"
         ) %>%
-          rhandsontable::hot_validate_character(col = "Metric", choices = c("cosine", "euclidian"), allowInvalid = FALSE) %>%
           rhandsontable::hot_validate_numeric(cols = "# Teams", min = 1L, max = as.integer(nrow(data)), allowInvalid = FALSE) %>%
           rhandsontable::hot_validate_numeric(cols = "Team size", min = 1L, max = as.integer(nrow(data)), allowInvalid = FALSE) %>%
-          rhandsontable::hot_validate_numeric(cols = "# Iterations", min = 100L, max = 5000L, allowInvalid = FALSE) %>%
-          rhandsontable::hot_validate_numeric(cols = "Buffer", min = 50L, max = 500L, allowInvalid = FALSE)
+          rhandsontable::hot_validate_numeric(cols = "# Iterations", min = 100L, max = 5000L, allowInvalid = FALSE)
         
         tab
       })
@@ -234,8 +230,8 @@ server <- function(input, output, session) {
         team_size = team_size,
         weights = data_params$weights,
         n_it = data_params$params$n_it,
-        buffer = data_params$params$buffer,
-        dist_metric = data_params$params$dist_metric,
+        buffer = 200,
+        dist_metric = "cosine",
         seed = 1
       )
     } else {
@@ -378,7 +374,7 @@ server <- function(input, output, session) {
       type = "box"
     ) %>% 
       layout(
-        xaxis = list(title = NULL), 
+        xaxis = list(title = "Attributes"), 
         yaxis = list(title = "Rate"), 
         boxmode = "group"
       )
@@ -445,7 +441,7 @@ server <- function(input, output, session) {
         .$id %>%
         as.character()
     }
-      
+    
     update_material_dropdown_multiple(
       session = session,
       input_id = "selected_ids",
@@ -471,30 +467,32 @@ server <- function(input, output, session) {
         dplyr::select(-photo) %>%
         dplyr::filter(id %in% ids)
       
-      metric <- rhandsontable::hot_to_r(input$df_params)$dist_metric
-      w <- rhandsontable::hot_to_r(input$df_attr)$Weight
+      metric <- "cosine"
+      w <- isolate(rhandsontable::hot_to_r(input$df_attr)$Weight)
       
       data_aux <- data[, -1]
       rownames(data_aux) <- data$id
       
-      if(metric == "cosine") {
-        data <- as.matrix(cosine(x = data_aux, weights = w))
-      } else {
-        data <- as.matrix(euclidean(x = data_aux, weights = w))
+      if(nrow(data_aux) > 0) {
+        if(metric == "cosine") {
+          data <- as.matrix(cosine(x = data_aux, weights = w))
+        } else {
+          data <- as.matrix(euclidean(x = data_aux, weights = w))
+        }
+        
+        data[upper.tri(data)] <- NA
+        
+        plt <- plot_ly(
+          x = colnames(data),
+          y = rownames(data), 
+          z = data, 
+          colors = roma_palette[c(11, 2)],
+          hovertemplate = 'Distance between %{y} and %{x}: %{z:.4f}<extra></extra>',
+          type = "heatmap"
+        )
+        
+        return(plt)
       }
-      
-      data[upper.tri(data)] <- NA
-      
-      plt <- plot_ly(
-        x = colnames(data),
-        y = rownames(data), 
-        z = data, 
-        colors = roma_palette[c(11, 2)],
-        hovertemplate = 'Distance between %{y} and %{x}: %{z:.4f}<extra></extra>',
-        type = "heatmap"
-      )
-      
-      return(plt)
     }
   })
   
