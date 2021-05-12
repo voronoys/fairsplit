@@ -36,12 +36,13 @@ ui <- shinymaterial::material_page(
     shinymaterial::material_modal(
       modal_id = "params_modal", 
       display_button = FALSE,
+      button_text = "",
       title = shiny::htmlOutput(outputId = "title"),
       
-      shiny::p("You can change the attributes' configuration"),
+      shiny::p("Change the description, weight in the algorithm, and the maximum value for each attribute."),
       shinycssloaders::withSpinner(ui_element = rhandsontable::rHandsontableOutput(outputId = "df_attr", height = "15em"), type = 8),
       
-      shiny::p("You can also change the algorithm's settings"),
+      shiny::p("Select size and number of teams. You can also change the number of iterations."),
       shinycssloaders::withSpinner(ui_element = rhandsontable::rHandsontableOutput(outputId = "df_params"), type = 8),
       
       shiny::br(),
@@ -52,11 +53,12 @@ ui <- shinymaterial::material_page(
     shinymaterial::material_modal(
       modal_id = "upload_modal",
       display_button = FALSE,
+      button_text = "",
       title = "Upload your own dataset",
       
       shiny::p("The file must follow the structure: 'id', 'photo', 'attributes'."),
       fileInput2(inputId = "user_data", accept = c(".txt", ".csv"), placeholder = "Drop a file here!"),
-      shiny::h5("Acceptable extensions: txt and csv. Read the guidelines for a full explanation.", style = "font-size: 1em"),
+      shiny::h5("Acceptable extensions: txt and csv.", style = "font-size: 1em"),
       
       shiny::br(),
       shinymaterial::material_button(input_id = "upload_file", label = "Upload", icon = NULL)

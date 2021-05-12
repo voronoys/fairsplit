@@ -80,7 +80,7 @@ ui_examples <- shiny::tagList(
       shinymaterial::material_column(
         width = 12,
         shinymaterial::material_card(
-          title = "Teams",
+          title = "Teams outputs",
           divider = TRUE,
           shiny::br(),
           shinymaterial::material_checkbox(input_id = "scaled_attrs", label = "Scaled attributes", initial_value = FALSE),
@@ -110,7 +110,7 @@ ui_examples <- shiny::tagList(
             shinymaterial::material_column(
               width = 12, 
               shinymaterial::material_card(
-                title = "Teams",
+                title = "Teams table",
                 divider = TRUE,
                 br(),
                 shinycssloaders::withSpinner(ui_element = reactable::reactableOutput(outputId = "tab_groups"), type = 8)
@@ -125,7 +125,7 @@ ui_examples <- shiny::tagList(
       shinymaterial::material_column(
         width = 12, 
         shinymaterial::material_card(
-          title = "Individuals",
+          title = "Individuals outputs",
           divider = TRUE,
           shinymaterial::material_card(
             shinymaterial::material_row(
@@ -202,7 +202,7 @@ ui_examples <- shiny::tagList(
       shinymaterial::material_column(
         width = 12, 
         shinymaterial::material_card(
-          title = "Algorithm",
+          title = "Algorithm outputs",
           divider = TRUE,
           shinymaterial::material_row(
             shiny::br(),
@@ -210,7 +210,7 @@ ui_examples <- shiny::tagList(
             shinymaterial::material_column(
               width = 4, 
               shinymaterial::material_card(
-                title = "Metric over iterations",
+                title = "Objective function over iterations",
                 divider = TRUE,
                 shiny::br(),
                 shinycssloaders::withSpinner(ui_element = plotly::plotlyOutput(outputId = "plot_metric"), type = 8)
