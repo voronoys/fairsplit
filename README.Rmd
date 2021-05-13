@@ -56,7 +56,7 @@ In our app the user can specify algorithm parameters:
 
 - Number of iterations
 - Number of teams 
-- Size of each team.
+- Size of each team
 
 <center>
   <img src="docs/f_obj.png"></img>
@@ -66,7 +66,7 @@ In our app the user can specify algorithm parameters:
 
 - Nossa Pelada: 
 
-This example is based on a weekly match we usually had (before the COVID-19 era)
+This example is based on a weekly match we usually had (before COVID-19 era)
 in Belo Horizonte, Brazil. People and attributes are real and based on my
 perception.
 
@@ -75,8 +75,8 @@ perception.
 This example is based on FIFA 20 scouts. To make it simple we only selected
 players from Barcelona, Juventus, Paris Saint-Germain, Real Madrid, Manchester
 City, and Liverpool. Also, we only selected midfielders and attacking players.
-<br> Source:
-https://www.kaggle.com/stefanoleone992/fifa-20-complete-player-dataset?select=players_20.csv
+<br> 
+Source: https://www.kaggle.com/stefanoleone992/fifa-20-complete-player-dataset?select=players_20.csv
 
 - Pokémon:
 
@@ -96,11 +96,12 @@ knowledge about some R packages. The attributes are completely random.
 
 - Upload your own data:
 
-Try yourself!
-<br>
+<center>
+<h1>Try yourself!</h1>
 Download our template and fill it with your data and split your teams.
+</center>
 
-## Preview
+# Preview
 
 <center>
   <img src="docs/video.gif"></img>

@@ -68,7 +68,7 @@ which can ensure a more enjoyable match.
 In our app the user can specify algorithm parameters:
 - Number of iterations
 - Number of teams 
-- Size of each team.
+- Size of each team
 
 <center>
   <img src="f_obj.png"></img>
