@@ -8,12 +8,6 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{css, echo=FALSE}
-p {
-  text-align: justify;
-}
-```
-
 ## Links
 
 + Live version: [FairSplit - Live app](https://voronoys.shinyapps.io/fairsplit/)

@@ -1,12 +1,6 @@
 
 # FairSplit
 
-<style type="text/css">
-p {
-  text-align: justify;
-}
-</style>
-
 ## Links
 
 -   Live version: [FairSplit - Live
