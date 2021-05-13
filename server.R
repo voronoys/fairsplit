@@ -5,6 +5,24 @@ server <- function(input, output, session) {
     shinymaterial::open_material_modal(session = session, modal_id = 'upload_modal')
   })
   
+  output$data_example <- downloadHandler(
+    filename = function() {
+      'fairsplit_template.csv'
+    },
+    content = function(file) {
+      
+      data <- data.frame(
+        id = paste("Person", 1:12),
+        photo = "https://image.flaticon.com/icons/png/512/147/147144.png",
+        attribute1 = rbinom(n = 12, size = 10, prob = 0.4),
+        attribute2 = rbinom(n = 12, size = 10, prob = 0.6),
+        attribute3 = rbinom(n = 12, size = 10, prob = 0.8)
+        )
+      
+      write.csv(x = data, file = file, row.names = FALSE)
+    }
+  )
+  
   # Open data
   open_data <- shiny::eventReactive(
     c(input$real_example, 
@@ -102,6 +120,7 @@ server <- function(input, output, session) {
                 
                 data <- NULL
               } else {
+                data$photo[is.na(data$photo)] = "https://image.flaticon.com/icons/png/512/147/147144.png"
                 data <- data[, colSums(is.na(data)) == 0]
                 
                 title <- "Check the information"
@@ -162,7 +181,7 @@ server <- function(input, output, session) {
       params <- data.frame(
         n_teams = n_teams, 
         team_size = team_size, 
-        n_it = 300L
+        n_it = 1000L
       )
       
       output$df_params <- rhandsontable::renderRHandsontable({
@@ -407,6 +426,8 @@ server <- function(input, output, session) {
       select(-rank)
     
     max_vec <- data$Maximum
+    if(input$scaled_attrs) max_vec <- 1
+    
     data <- data %>% select(-Maximum)
     
     plt <- plot_radar(data = data, cols = names(data)[-1], max = max_vec)

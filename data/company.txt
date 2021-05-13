@@ -1,14 +1,14 @@
 id;photo;Feature Engineering;Linear regression;Probability;GLM;Survival analysis;Time series;Spatial statistics;Bayesian inference;Clustering;Random Forest;Deep Learning;NLP;Explanable AI;Web Scraping;SQL;Spark;R;Python;Julia;PyTorch;Shiny (R);streamlit;Auto-ML;MLFlow
-Angelo;https://image.flaticon.com/icons/png/512/147/147144.png;3;3;3;1;0;3;1;1;2;3;1;2;2;0;3;2;0;3;0;1;0;0;0;0
-Antonio;https://image.flaticon.com/icons/png/512/147/147144.png;3;3;2;0;0;2;0;2;3;2;3;1;1;0;1;1;1;3;0;3;0;0;2;2
-Claudio;https://image.flaticon.com/icons/png/512/147/147144.png;1;1;1;0;0;0;0;0;1;2;1;2;0;1;3;0;2;2;0;1;2;2;1;0
-Cris Freitas;https://image.flaticon.com/icons/png/512/147/147144.png;2;1;1;0;0;0;0;0;2;2;1;0;0;0;3;1;1;2;0;1;0;0;0;0
-Daniela;https://image.flaticon.com/icons/png/512/147/147144.png;3;2;2;1;0;2;0;1;3;3;2;1;0;2;3;0;1;3;0;2;0;2;0;3
-Daniel;https://image.flaticon.com/icons/png/512/147/147144.png;2;2;1;0;0;1;0;1;2;2;1;2;0;0;3;0;2;2;0;1;0;0;0;0
-Douglas;https://image.flaticon.com/icons/png/512/147/147144.png;2;3;3;3;3;3;3;3;2;3;1;1;1;2;2;2;3;2;0;0;3;1;1;1
-Eduardo;https://image.flaticon.com/icons/png/512/147/147144.png;1;1;1;0;0;0;0;1;1;1;0;0;0;2;3;2;1;2;1;1;0;1;0;0
-Fabricio;https://image.flaticon.com/icons/png/512/147/147144.png;2;2;1;0;0;1;0;0;1;1;1;0;0;0;2;0;1;2;0;1;0;1;0;1
-Gabriel;https://image.flaticon.com/icons/png/512/147/147144.png;2;2;1;1;1;0;0;0;1;2;0;2;0;2;1;1;1;3;0;1;0;0;0;0
-José Ricardo;https://image.flaticon.com/icons/png/512/147/147144.png;3;3;3;3;2;2;0;1;3;3;2;1;0;3;3;1;1;3;0;2;0;0;2;1
-Pedro Araujo;https://image.flaticon.com/icons/png/512/147/147144.png;2;3;3;3;2;2;2;3;1;2;1;0;0;1;1;0;3;2;0;0;3;1;0;0
-Pedro Kassio;https://image.flaticon.com/icons/png/512/147/147144.png;3;3;3;3;2;2;0;2;3;3;2;2;1;2;3;2;2;3;1;2;1;0;1;2
+Person 1;https://image.flaticon.com/icons/png/512/147/147144.png;3;3;3;1;0;3;1;1;2;3;1;2;2;0;3;2;0;3;0;1;0;0;0;0
+Person 2;https://image.flaticon.com/icons/png/512/147/147144.png;3;3;2;0;0;2;0;2;3;2;3;1;1;0;1;1;1;3;0;3;0;0;2;2
+Person 3;https://image.flaticon.com/icons/png/512/147/147144.png;1;1;1;0;0;0;0;0;1;2;1;2;0;1;3;0;2;2;0;1;2;2;1;0
+Person 4;https://image.flaticon.com/icons/png/512/147/147144.png;2;1;1;0;0;0;0;0;2;2;1;0;0;0;3;1;1;2;0;1;0;0;0;0
+Person 5;https://image.flaticon.com/icons/png/512/147/147144.png;3;2;2;1;0;2;0;1;3;3;2;1;0;2;3;0;1;3;0;2;0;2;0;3
+Person 6;https://image.flaticon.com/icons/png/512/147/147144.png;2;2;1;0;0;1;0;1;2;2;1;2;0;0;3;0;2;2;0;1;0;0;0;0
+Person 7;https://image.flaticon.com/icons/png/512/147/147144.png;2;3;3;3;3;3;3;3;2;3;1;1;1;2;2;2;3;2;0;0;3;1;1;1
+Person 8;https://image.flaticon.com/icons/png/512/147/147144.png;1;1;1;0;0;0;0;1;1;1;0;0;0;2;3;2;1;2;1;1;0;1;0;0
+Person 9;https://image.flaticon.com/icons/png/512/147/147144.png;2;2;1;0;0;1;0;0;1;1;1;0;0;0;2;0;1;2;0;1;0;1;0;1
+Person 10;https://image.flaticon.com/icons/png/512/147/147144.png;2;2;1;1;1;0;0;0;1;2;0;2;0;2;1;1;1;3;0;1;0;0;0;0
+Person 11;https://image.flaticon.com/icons/png/512/147/147144.png;3;3;3;3;2;2;0;1;3;3;2;1;0;3;3;1;1;3;0;2;0;0;2;1
+Person 12;https://image.flaticon.com/icons/png/512/147/147144.png;2;3;3;3;2;2;2;3;1;2;1;0;0;1;1;0;3;2;0;0;3;1;0;0
+Person 13;https://image.flaticon.com/icons/png/512/147/147144.png;3;3;3;3;2;2;0;2;3;3;2;2;1;2;3;2;2;3;1;2;1;0;1;2

@@ -42,7 +42,7 @@ ui <- shinymaterial::material_page(
       shiny::p("Change the description, weight in the algorithm, and the maximum value for each attribute."),
       shinycssloaders::withSpinner(ui_element = rhandsontable::rHandsontableOutput(outputId = "df_attr", height = "15em"), type = 8),
       
-      shiny::p("Select size and number of teams. You can also change the number of iterations."),
+      shiny::p("Select the number of individuals and number of teams. You can also change the number of iterations."),
       shinycssloaders::withSpinner(ui_element = rhandsontable::rHandsontableOutput(outputId = "df_params"), type = 8),
       
       shiny::br(),
@@ -56,7 +56,15 @@ ui <- shinymaterial::material_page(
       button_text = "",
       title = "Upload your own dataset",
       
-      shiny::p("The file must follow the structure: 'id', 'photo', 'attributes'."),
+      shiny::p(
+        shiny::HTML(
+          sprintf(
+            "The file must contain: 'id' and 'photo' columns, and one column for each attribute. Click %s to download a file to serve as an example.",
+            downloadLink(outputId = "data_example", label = "here", style = "font-color: #FF0000")
+          )
+        )
+      ),
+      
       fileInput2(inputId = "user_data", accept = c(".txt", ".csv"), placeholder = "Drop a file here!"),
       shiny::h5("Acceptable extensions: txt and csv.", style = "font-size: 1em"),
       

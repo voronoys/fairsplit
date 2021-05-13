@@ -80,7 +80,7 @@ ui_examples <- shiny::tagList(
       shinymaterial::material_column(
         width = 12,
         shinymaterial::material_card(
-          title = "Teams outputs",
+          title = "Teams' outputs",
           divider = TRUE,
           shiny::br(),
           shinymaterial::material_checkbox(input_id = "scaled_attrs", label = "Scaled attributes", initial_value = FALSE),
@@ -110,7 +110,7 @@ ui_examples <- shiny::tagList(
             shinymaterial::material_column(
               width = 12, 
               shinymaterial::material_card(
-                title = "Teams table",
+                title = "Teams' table",
                 divider = TRUE,
                 br(),
                 shinycssloaders::withSpinner(ui_element = reactable::reactableOutput(outputId = "tab_groups"), type = 8)
@@ -125,7 +125,7 @@ ui_examples <- shiny::tagList(
       shinymaterial::material_column(
         width = 12, 
         shinymaterial::material_card(
-          title = "Individuals outputs",
+          title = "Individuals' outputs",
           divider = TRUE,
           shinymaterial::material_card(
             shinymaterial::material_row(
@@ -176,7 +176,7 @@ ui_examples <- shiny::tagList(
               shinymaterial::material_column(
                 width = 4, 
                 shinymaterial::material_card(
-                  title = "Individuals dispersion",
+                  title = "Individuals' dispersion",
                   divider = TRUE,
                   shiny::br(),
                   shinycssloaders::withSpinner(ui_element = plotly::plotlyOutput(outputId = "plot_id_dispersion"), type = 8)
@@ -202,7 +202,7 @@ ui_examples <- shiny::tagList(
       shinymaterial::material_column(
         width = 12, 
         shinymaterial::material_card(
-          title = "Algorithm outputs",
+          title = "Algorithm's outputs",
           divider = TRUE,
           shinymaterial::material_row(
             shiny::br(),
@@ -230,7 +230,7 @@ ui_examples <- shiny::tagList(
             shinymaterial::material_column(
               width = 4,
               shinymaterial::material_card(
-                title = "Probability per team",
+                title = "Probability of belonging to each team",
                 divider = TRUE,
                 shiny::br(),
                 shinycssloaders::withSpinner(ui_element = plotly::plotlyOutput(outputId = "plot_probs"), type = 8)

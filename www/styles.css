@@ -101,6 +101,9 @@ body {
     font-size: 0.5em !important;
 }
 
+.p {
+  text-align: justify;
+}
 .swal2-popup .swal2-styled.swal2-confirm {
     font-size: 0.8em !important;
 }

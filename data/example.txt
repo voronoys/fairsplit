@@ -1,0 +1,22 @@
+id;photo;pace;shooting;dribbling;passing;defending;physic;goalkeeping
+Douglas;;8;6;8;8;7;7;3
+Luís;;6;9;8;8;7;6;4
+Augusto;;7;8;7;8;8;7;4
+Godoy;;8;7;8;7;6;8;3
+Roberto;;8;8;7;8;7;8;5
+Lucas;;8;6;5;7;6;6;6
+Marcos;;6;6;6;6;6;5;4
+Wagner;;7;7;6;5;5;6;5
+Leonardo;;8;7;5;7;7;7;4
+Paulo;;3;4;3;6;6;5;9
+Bruno;;7;6;5;8;6;9;9
+Guilherme;;10;9;7;8;7;9;4
+Pedro;;3;3;5;5;2;2;3
+Sabir;;7;7;7;7;7;7;5
+Rodrygo;;5;3;6;7;7;5;4
+Alberto;;5;3;6;6;7;7;6
+Alef;;7;7;7;7;7;8;3
+Tiago Cunha;;6;7;6;7;7;6;3
+Rafael Colares;;6;7;7;7;7;5;3
+Osvaldo;;5;5;5;6;7;5;3
+Gabriel Coutinho;;7;7;6;7;7;7;4

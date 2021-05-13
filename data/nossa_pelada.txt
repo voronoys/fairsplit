@@ -9,7 +9,6 @@ Marcos;pelada/marcos.jpeg;6;6;6;6;6;5;4
 Wagner;pelada/wagner.jpeg;7;7;6;5;5;6;5
 Leonardo;pelada/leonardo.jpeg;8;7;5;7;7;7;4
 Paulo;pelada/paulo.jpeg;3;4;3;6;6;5;9
-Estevão;pelada/estevao.jpeg;6;6;5;7;7;7;4
 Bruno;pelada/bruno.jpeg;7;6;5;8;6;9;9
 Guilherme;pelada/guilherme.jpeg;10;9;7;8;7;9;4
 Pedro;pelada/pedro.jpeg;3;3;5;5;2;2;3
