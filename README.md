@@ -16,24 +16,13 @@ it!
 
 ## Quick reading: Highlights
 
-Soccer is the most popular sport in Brazil and before every
-(non-professional) match, a task is necessary: split the teams. A common
-way to do it is to choose as many captains as the number of teams. They
-have the role to select their teams based on their previous knowledge
-about the players’ skills. The algorithm starts with one of these
-captains selecting one player among all available ones. After that, it
-is time for the next captain to start selecting their team and again
-another player is selected among all available players. The algorithm
-keeps going until all the players are allocated to a team.
+Soccer is the most popular sport in Brazil, and before every
+(non-professional) match, an important task is required: **split the teams in equal size, and hopefully in balanced power**. 
+A common strategy to do it is to choose as many captains as the number of teams. Next, the captains have to select their teams based on their previous knowledge about the players’ skills. The dynamic of picking the players start with one of these captains selecting one player among all available ones. After that,  the next captain picks a player to his/her team. The dynamic keeps going until all the players are designated to a team.
 
 Usually, the last captain has a weaker team as the other captains have
 already selected the best players before. Also, the ‘best player’ can be
-someone good in one specific position and the concept itself is
-completely subjective. The same situation is rapidly applicable to other
-sports as volleyball, handball, basketball, eSports and so on. However,
-the task of creating teams is not just applied to sports. It is common
-to have teams in a company, for example. In such a case, the teams are
-defined based on the needs of each project.
+someone good in one specific position (defence or attack), and the concept itself is entirely subjective. The same situation is rapidly applicable to other sports such as volleyball, handball, basketball, eSports, etc. However, the task of creating teams is not just applied to sports. It is common to have teams in a company, for example. In such a case, the teams are defined based on the needs of each project.
 
 <center>
 <img src="docs/radar.png"></img>
@@ -41,15 +30,10 @@ defined based on the needs of each project.
 
 ## Algorithm
 
-We implemented a simple and useful iterative method. For each
-individual, a set of attributes is collected, and, based on them, teams
-are created ensuring that the overall teams’ metrics are similar. To do
-so, individuals are divided into teams and teams’ similarity is
-calculated. After this, new settings are proposed and we keep the one in
-which the similarity is the biggest.
+We have implemented a simple and useful iterative method to generate team splitting fairly. Our approach is based on each person's attributes, ensuring that the overall teams' metrics are similar. First, the method starts breaking the teams randomly and then computes the teams' similarity. The next step is to arrange the teams in a new configuration seeking the maximum similarity between them. Finally, the algorithm keeps looking for the best splitting configuration and chooses the one arrangement that maximizes the similarity.
 
 As a result, we have competitive teams with similar characteristics
-which can ensure a more enjoyable match.
+which can ensure a more enjoyable matches.
 
 In our app the user can specify algorithm parameters:
 
